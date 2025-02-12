@@ -157,7 +157,7 @@ def get_current_version():
     version["build_metadata"] = (
         version["build_metadata"] if version["build_metadata"] != None else ""
     )
-    version["str"] = result
+    version["str"] = latest_tag
     return version
 
 
