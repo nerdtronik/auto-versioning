@@ -106,6 +106,17 @@ def get_current_version():
         "grep",
         "Latest",
     ]
+    command_debug = [
+        "gh",
+        "release",
+        "list",
+        "--limit",
+        "100",
+        "--order",
+        "asc"
+    ]
+    result_debug = run_command(" ".join(command_debug))
+    log.info(f"\n{result_debug}")
 
     result = run_command(" ".join(command))
     log.debug("Current versions:\n", result)
