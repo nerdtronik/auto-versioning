@@ -1,0 +1,138 @@
+name: "Automatic Version Tag"
+description: "Calculate your next version tag based on changes using SemVer v2.0.0"
+inputs:
+  target-commit:
+    description: "Commit to compare changes against (usually branch merging to)"
+    required: true
+    default: ""
+  source-commit:
+    description: "Commit to compare changes to target-commit (usually pr branch to merge)"
+    required: true
+  patch-limit:
+    description: "Top how many % of changes limit to increase a patch version vX.Y.(Z+1)"
+    default: "10"
+  minor-limit:
+    description: "Top how many % of changes limit to increase a minor version vX.(Y+1).Z"
+    default: "75"
+  directory:
+    description: "Base directory to check the changes"
+    default: "."
+  exclude:
+    description: "List of files, paths, patterns (./*path*) to exclude from changes checking (space separated)"
+    default: ""
+  include-only:
+    description: "List of files, paths, patterns (./*path*) to include only for changes checking (space separated)"
+    default: ""
+  important-files:
+    description: "List of files, paths, patterns (./*path*) to mark as important for changes checking (space separated)"
+    default: ""
+  importance-rate:
+    description: "How important an important file will be (default 1.1)"
+    default: "1.1"
+  v-prefix:
+    description: "Include the 'v' prefix in the version tag: vX.Y.Z"
+    default: "true"
+  is-alpha:
+    description: "Mark this version as an alpha"
+    default: "false"
+  is-beta:
+    description: "Mark this version as a beta"
+    default: "false"
+  is-rc:
+    description: "Mark this version as a release candidate"
+    default: "false"
+  is-draft:
+    description: "Mark this version as a draft"
+    default: "false"
+  is-prerelease:
+    description: "Mark this version as a prerelease"
+    default: "false"
+  debug:
+    description: "Show debug messages"
+    default: "false"
+  create-tag:
+    description: "Create release tag after calculating it"
+    default: "true"
+  prerelease-tag:
+    description: "Prerelease tag to add at the end of the version tag"
+    default: ""
+  build-metadata:
+    description: "Build metadata to add at the end of the version tag"
+    default: ""
+  github-token:
+    description: "Github Token to create the tag at the end of the process (required if want to create tag at the end)"
+outputs:
+  version_str:
+    description: "version string"
+    value: ${{ steps.main-process.outputs.version_str }}
+  major:
+    description: "Version major number"
+    value: ${{ steps.main-process.outputs.major }}
+  minor:
+    description: "Version minor number"
+    value: ${{ steps.main-process.outputs.minor }}
+  patch:
+    description: "Version patch number"
+    value: ${{ steps.main-process.outputs.patch }}
+  prerelease:
+    description: "Version prerelease info"
+    value: ${{ steps.main-process.outputs.prerelease }}
+  build-metadata:
+    description: "Version build-metadata info"
+    value: ${{ steps.main-process.outputs.build_metadata }}
+  files-changed:
+    description: How many files were changed between commits
+    value: ${{ steps.main-process.outputs.files_changed }}
+  files-added:
+    description: How many files were added between commits
+    value: ${{ steps.main-process.outputs.files_added }}
+  files-removed:
+    description: How many files were removed between commits
+    value: ${{ steps.main-process.outputs.files_removed }}
+  insertions:
+    description: How many lines were added between commits
+    value: ${{ steps.main-process.outputs.insertions }}
+  deletions:
+    description: How many lines were removed between commits
+    value: ${{ steps.main-process.outputs.deletions }}
+  max-change-percentage:
+    description: The maximum change percentage between commits
+    value: ${{ steps.main-process.outputs.max_percentage }}
+  min-change-percentage:
+    description: The minimum change percentage between commits
+    value: ${{ steps.main-process.outputs.min_percentage }}
+  avg-change-percentage:
+    description: The average change percentage between commits
+    value: ${{ steps.main-process.outputs.avg_percentage }}
+  cumulative-change-percentage:
+    description: The sum of all change percentages between commits
+    value: ${{ steps.main-process.outputs.cumulative_percentage }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: 🤖 Automatic version tag
+      id: main-process
+      run: ./start.sh
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        target_commit: "${{ inputs.target-commit }}"
+        source_commit: "${{ inputs.source-commit }}"
+        patch_limit: "${{ inputs.patch-limit }}"
+        minor_limit: "${{ inputs.minor-limit }}"
+        directory: "${{ inputs.directory }}"
+        exclude: "${{ inputs.exclude }}"
+        include_only: "${{ inputs.include-only }}"
+        important_files: "${{ inputs.important-files }}"
+        importance_rate: "${{ inputs.importance-rate }}"
+        v_prefix: "${{ inputs.v-prefix }}"
+        is_alpha: "${{ inputs.is-alpha }}"
+        is_beta: "${{ inputs.is-beta }}"
+        is_rc: "${{ inputs.is-rc }}"
+        is_draft: "${{ inputs.is-draft }}"
+        is_prerelease: "${{ inputs.is-prerelease }}"
+        create_tag: "${{ inputs.create-tag }}"
+        prerelease_tag: "${{ inputs.prerelease-tag }}"
+        build_metadata: "${{ inputs.build-metadata }}"
+        debug: "${{ inputs.debug }}"
