@@ -11,7 +11,7 @@ jobs:
             with:
               fetch-depth: 2  # Fetch enough history to compare commits
 
-          - name: Total Changes
+          - name: Calculate Next Version
             uses: ./
             id: versioning
             with:
