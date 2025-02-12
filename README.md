@@ -10,7 +10,7 @@ For example, if your current version is `v1.2.1` if you merge a pr with changes 
 <!-- start usage -->
 
 ```yaml
-- uses: HenryCabarcas/auto-versioning@v1.0.0
+- uses: HenryCabarcas/auto-versioning@v1.0.4
   with:
     # Commit to compare changes against (usually branch merging to or pr target)
     # This uses the commit id/sha
@@ -164,7 +164,7 @@ jobs:
                 fetch-depth: 2  # Fetch enough history to compare commits
 
             - name: Calculate Next Version
-              uses: HenryCabarcas/auto-versioning@v1.0.0
+              uses: HenryCabarcas/auto-versioning@v1.0.4
               id: versioning
               with:
                 target-commit: ${{ github.event.pull_request.base.sha }}
@@ -198,7 +198,7 @@ jobs:
                 fetch-depth: 2  # Fetch enough history to compare commits
 
             - name: Total Changes
-              uses: HenryCabarcas/auto-versioning@v1.0.0
+              uses: HenryCabarcas/auto-versioning@v1.0.4
               id: versioning
               with:
                 source-commit: ${{ github.event.after }}
@@ -228,7 +228,7 @@ jobs:
                 fetch-depth: 0  # Fetch all history to compare commits
 
             - name: Total Changes
-              uses: HenryCabarcas/auto-versioning@v1.0.0
+              uses: HenryCabarcas/auto-versioning@v1.0.4
               id: versioning
               with:
                 source-commit: ${{ github.event.after }}
