@@ -1,8 +1,8 @@
 name: "Automatic Versioning Tag"
 branding:
-  icon: 'bookmark'
+  icon: 'git-branch'
   color: 'black'
-description: "Calculate your next version tag based on changes using SemVer v2.0.0"
+description: "Calculate your next version tag based on file changes automatically using SemVer v2.0.0 syntax"
 inputs:
   target-commit:
     description: "Commit to compare changes against (usually branch merging to)"
