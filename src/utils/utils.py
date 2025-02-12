@@ -111,9 +111,7 @@ def get_current_version():
         "release",
         "list",
         "--limit",
-        "100",
-        "--order",
-        "asc"
+        "100"
     ]
     result_debug = run_command(" ".join(command_debug))
     log.info(f"\n{result_debug}")
