@@ -2,6 +2,8 @@ import os
 import subprocess
 import re
 from .logger import log
+import json
+from datetime import datetime
 
 base_directory = os.getcwd()
 
@@ -85,6 +87,25 @@ def get_files_lines_count(file_list: list[str]):
     return sum(rawgencount(file) for file in file_list)
 
 
+def get_latest_date(date_strings, date_format):
+    """
+    Compares a list of date strings and returns the latest date string.
+
+    Args:
+        date_strings: A list of date strings.
+        date_format: The format of the date strings (e.g., "%Y-%m-%d").
+
+    Returns:
+        The latest date string, or None if the input list is empty.
+    """
+    if not date_strings:
+        return None
+
+    dates = [datetime.strptime(date_str, date_format) for date_str in date_strings]
+    latest_date = max(dates)
+    return latest_date.strftime(date_format)
+
+
 def get_current_version():
     default_ver = {
         "major": 0,
@@ -100,29 +121,29 @@ def get_current_version():
         "list",
         "--limit",
         "100",
-        "--order",
-        "asc",
-        "|",
-        "grep",
-        "Latest",
+        "--json",
+        "publishedAt,name,tagName,isLatest,isDraft",
     ]
-    command_debug = [
-        "gh",
-        "release",
-        "list",
-        "--limit",
-        "100"
-    ]
-    result_debug = run_command(" ".join(command_debug))
-    log.info(f"\n{result_debug}")
 
     result = run_command(" ".join(command))
     log.debug("Current versions:\n", result)
     if not result:
         return default_ver
 
-    result = result.split("\t")[0]
-    valid = semver_validation.search(result)
+    results = json.loads(result)
+    results = list(filter(lambda x: x["isDraft"] == False, results))
+
+    date_strings = [item["publishedAt"] for item in results]
+    date_format = "%Y-%m-%dT%H:%M:%SZ"
+    latest_date = get_latest_date(date_strings, date_format)
+
+    filtering = list(filter(lambda x: x["publishedAt"] == latest_date, results))
+    if len(filtering) == 0:
+        return default_ver
+
+    latest_tag = filtering[0]["tagName"]
+
+    valid = semver_validation.search(latest_tag)
 
     if not valid:
         return default_ver
