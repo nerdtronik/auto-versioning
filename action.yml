@@ -1,4 +1,5 @@
 name: "Automatic Version Tag"
+icon: bookmark
 description: "Calculate your next version tag based on changes using SemVer v2.0.0"
 inputs:
   target-commit:
