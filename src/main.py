@@ -31,8 +31,8 @@ def main():
         args.exclude.append("__pycache__")
     if not ".venv" in args.exclude:
         args.exclude.append(".venv")
-    if not ".git*" in args.exclude:
-        args.exclude.append(".git*")
+    if not ".git" in args.exclude:
+        args.exclude.append(".git\/")
 
     log.debug(args)
     log.info("Listing files and counting lines")
