@@ -118,14 +118,18 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: HenryCabarcas/auto-versioning
+        path: ./.auto-versioning
     - uses: actions/setup-python@v5
       with:
         python-version: '3.13'
+    - name: Install the gh cli
+      uses: ksivamuthu/actions-setup-gh-cli@v3
+
     - shell: bash
-      run: echo "${{ github }}"
+      run: echo '${{ toJson(github) }}'
     - name: 🤖 Automatic version tag
       id: main-process
-      run: ./start.sh
+      run: ./.auto-versioning/start.sh
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
