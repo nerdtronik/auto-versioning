@@ -138,7 +138,7 @@ runs:
       run: ./.auto-versioning/start.sh
       shell: bash
       env:
-        SRC_PATH: ${{ github.path }}
+        SRC_PATH: ${{ github.workspace }}
         GH_TOKEN: ${{ inputs.github-token }}
         target_commit: "${{ inputs.target-commit }}"
         source_commit: "${{ inputs.source-commit }}"
