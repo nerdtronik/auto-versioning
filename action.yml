@@ -126,7 +126,7 @@ runs:
       uses: ksivamuthu/actions-setup-gh-cli@v3
 
     - shell: bash
-      run: echo '${{ toJson(github) }}''
+      run: echo '${{ toJson(github) }}'
     - name: 🤖 Automatic version tag
       id: main-process
       run: ./.auto-versioning/start.sh
