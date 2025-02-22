@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-ls -la $SRC_PATH
-cd $SRC_PATH || echo "XDDDD"
 
 target_commit=${target_commit:-}
 source_commit=${source_commit:-}
