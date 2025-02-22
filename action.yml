@@ -114,6 +114,9 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: 📩 Checkout Source
+      uses: actions/checkout@v4
+      
     - name: 🤖 Automatic version tag
       id: main-process
       run: ./start.sh
