@@ -119,6 +119,7 @@ runs:
       with:
         fetch-depth: 2
     - run: git log --no-merges --no-decorate --pretty=format:%H -n 1 HEAD^
+      shell: bash
     - name: 🤖 Automatic version tag
       id: main-process
       run: ./start.sh
