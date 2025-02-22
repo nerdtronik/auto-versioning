@@ -1,6 +1,6 @@
 on:
   push:
-      branches: ["tests","main"]
+      branches: ["main"]
 jobs:
   push-workflow:
       runs-on: ubuntu-latest
