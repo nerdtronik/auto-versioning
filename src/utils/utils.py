@@ -55,7 +55,7 @@ def get_files_list(base_dir: str, exclude: list[str] = [], only: list[str] = [])
         if any(ex == os.path.basename(os.path.dirname(item)) for ex in [".git", ".venv", "__pycache__",".auto-versioning"]):
             log.debug(item, "dir excluded by default")
             continue
-        elif any(ex == os.path.basename(item) for ex in ["hg_tar"]):
+        if any(ex == os.path.basename(item) for ex in ["gh_tar"]):
             continue
         if os.path.isdir(item):
             result.extend(get_files_list(item, exclude=exclude, only=only))
