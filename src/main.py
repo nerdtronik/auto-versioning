@@ -87,7 +87,7 @@ def main():
     if not version_str and not version:
         log.warn("No changes detected, exiting")
         return 0
-
+    log.info("Detected changes:", max(changes["insertions%"], changes["deletions%"]),"%")
     commands = [
         f'echo "version_str=\'{version_str}\'" >> "$GITHUB_OUTPUT"',
         f'echo "major=\'{version["major"]}\'" >> "$GITHUB_OUTPUT"',

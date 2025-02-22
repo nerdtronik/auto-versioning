@@ -64,6 +64,9 @@ inputs:
     default: ""
   github-token:
     description: "Github Token to create the tag at the end of the process (required if want to create tag at the end)"
+  action-path:
+    required: false
+    default: ./.github/actions/.auto-versioning
 outputs:
   version_str:
     description: "version string"
@@ -118,7 +121,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: HenryCabarcas/auto-versioning
-        path: ./.auto-versioning
+        path: ${{ inputs.action-path }}
 
     - name: 🐍 Setup Python
       uses: actions/setup-python@v5
@@ -135,11 +138,12 @@ runs:
   
     - name: 🤖 Automatic version tag
       id: main-process
-      run: ./.auto-versioning/start.sh
+      run: ${{ inputs.action-path }}/start.sh
       shell: bash
       env:
+        WORKDIR: ${{ inputs.action-path }}
         SRC_PATH: ${{ github.workspace }}
-        GH_TOKEN: ${{ inputs.github-token }}
+        GH_TOKEN: ${{ inputs.github-token || github.token }}
         target_commit: "${{ inputs.target-commit }}"
         source_commit: "${{ inputs.source-commit }}"
         patch_limit: "${{ inputs.patch-limit }}"
