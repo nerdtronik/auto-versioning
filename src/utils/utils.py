@@ -53,7 +53,7 @@ def get_files_list(base_dir: str, exclude: list[str] = [], only: list[str] = [])
     for item in items:
         item = os.path.join(base_dir, item)
         if os.path.isdir(item):
-            if any(ex in item for ex in [".git", ".venv", "__pycache__"]):
+            if any(ex in item for ex in [".git/", ".venv/", "__pycache__/"]):
                 log.debug(item, "dir excluded by default")
                 continue
             result.extend(get_files_list(item, exclude=exclude, only=only))
