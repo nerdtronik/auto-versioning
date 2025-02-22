@@ -104,4 +104,4 @@ if [[ "$debug" == "true" ]]; then
     echo "Main command: python3 src/main.py $target_commit $command_args"
 fi
 
-python3 ./.auto-versioning/src/main.py $target_commit $command_args
+python3 ../.auto-versioning/src/main.py $target_commit $command_args
