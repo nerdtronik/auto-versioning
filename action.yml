@@ -119,19 +119,26 @@ runs:
       with:
         repository: HenryCabarcas/auto-versioning
         path: ./.auto-versioning
-    - uses: actions/setup-python@v5
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v5
       with:
         python-version: '3.13'
-    - name: Install the gh cli
+
+    - name: ⏬ Install the gh cli
       uses: ksivamuthu/actions-setup-gh-cli@v3
 
-    - shell: bash
+    - name: 🐞 Debug context
+      shell: bash
+      if: inputs.debug == 'true'
       run: echo '${{ toJson(github) }}'
+  
     - name: 🤖 Automatic version tag
       id: main-process
       run: ./.auto-versioning/start.sh
       shell: bash
       env:
+        SRC_PATH: ${{ github.workspace }}
         GH_TOKEN: ${{ inputs.github-token }}
         target_commit: "${{ inputs.target-commit }}"
         source_commit: "${{ inputs.source-commit }}"
