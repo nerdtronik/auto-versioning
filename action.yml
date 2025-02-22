@@ -122,8 +122,10 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.13'
+    - uses: actions4gh/setup-gh@v1
+    
     - shell: bash
-      run: echo "${{ github }}"
+      run: echo "${{ github.event }}"
     - name: 🤖 Automatic version tag
       id: main-process
       run: ./.auto-versioning/start.sh
