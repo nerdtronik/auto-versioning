@@ -29,6 +29,7 @@ if [[ ${#source_commit} -gt 0 ]]; then
 fi
 
 if [[ ${#target_commit} -eq 0 ]]; then
+    git pull
     target_commit=$(git log --no-merges --no-decorate --pretty=format:%H -n 1 HEAD^)
     echo "target: $target_commit"
 fi
