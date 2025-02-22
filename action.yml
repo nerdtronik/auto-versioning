@@ -116,7 +116,9 @@ runs:
   steps:
     - name: 📩 Checkout Source
       uses: actions/checkout@v4
-      
+      with:
+        fetch-depth: 2
+    - run: git log --no-merges --no-decorate --pretty=format:%H -n 1 HEAD^
     - name: 🤖 Automatic version tag
       id: main-process
       run: ./start.sh
