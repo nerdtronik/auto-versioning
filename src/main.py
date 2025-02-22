@@ -32,7 +32,7 @@ def main():
     if not ".venv" in args.exclude:
         args.exclude.append(".venv")
     if not ".git" in args.exclude:
-        args.exclude.append(".git\/")
+        args.exclude.append(".git/")
 
     log.debug(args)
     log.info("Listing files and counting lines")
