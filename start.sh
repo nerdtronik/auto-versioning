@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-ls -la
+ls -la $SRC_PATH
+cd $SRC_PATH || echo "XDDDD"
+
 target_commit=${target_commit:-}
 source_commit=${source_commit:-}
 patch_limit=${patch_limit:-10}
