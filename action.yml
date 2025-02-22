@@ -112,13 +112,15 @@ outputs:
     value: ${{ steps.main-process.outputs.cumulative_percentage }}
 
 runs:
+  env:
+    WORKDIR: ./.github/actions/.auto-versioning
   using: "composite"
   steps:
     - name: 📩 Checkout Source
       uses: actions/checkout@v4
       with:
         repository: HenryCabarcas/auto-versioning
-        path: ../.auto-versioning
+        path: ${{ env.WORKDIR }}
 
     - name: 🐍 Setup Python
       uses: actions/setup-python@v5
@@ -135,7 +137,7 @@ runs:
   
     - name: 🤖 Automatic version tag
       id: main-process
-      run: ../.auto-versioning/start.sh
+      run: ${{ env.WORKDIR }}/start.sh
       shell: bash
       env:
         SRC_PATH: ${{ github.workspace }}
