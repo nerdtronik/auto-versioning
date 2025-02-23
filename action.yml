@@ -122,8 +122,7 @@ runs:
       with:
         repository: HenryCabarcas/auto-versioning
         path: ${{ inputs.action-path }}
-    - shell: bash
-      run: 
+
     - name: 🐍 Setup Python
       uses: actions/setup-python@v5
       with:
