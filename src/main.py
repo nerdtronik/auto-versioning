@@ -31,7 +31,7 @@ def main():
         args.exclude.append("__pycache__")
     if not ".venv" in args.exclude:
         args.exclude.append(".venv")
-    if not ".git" in args.exclude:
+    if not ".git/" in args.exclude:
         args.exclude.append(".git/")
 
     log.debug(args)
@@ -52,7 +52,7 @@ def main():
         args.source_commit,
         args.target_commit,
         directory=current_directory,
-        exclude=args.exclude,
+        exclude=[*args.exclude, os.getenv("ACTION_WORKDIR"), ".auto-versioning/"],
         include=args.include_only,
     )
 
@@ -87,7 +87,9 @@ def main():
     if not version_str and not version:
         log.warn("No changes detected, exiting")
         return 0
-    log.info("Detected changes:", max(changes["insertions%"], changes["deletions%"]),"%")
+    log.info(
+        "Detected changes:", max(changes["insertions%"], changes["deletions%"]), "%"
+    )
     commands = [
         f'echo "version_str=\'{version_str}\'" >> "$GITHUB_OUTPUT"',
         f'echo "major=\'{version["major"]}\'" >> "$GITHUB_OUTPUT"',

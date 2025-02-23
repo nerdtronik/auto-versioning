@@ -104,4 +104,4 @@ if [[ "$debug" == "true" ]]; then
     echo "Main command: python3 src/main.py $target_commit $command_args"
 fi
 
-python3 $WORKDIR/src/main.py $target_commit $command_args
+python3 $ACTION_WORKDIR/src/main.py $target_commit $command_args

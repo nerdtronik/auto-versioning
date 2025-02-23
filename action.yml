@@ -129,7 +129,9 @@ runs:
         python-version: '3.13'
 
     - name: ⏬ Install the gh cli
-      uses: ksivamuthu/actions-setup-gh-cli@v3
+      uses: dev-hanz-ops/install-gh-cli-action@v0.2.1
+      with:
+        gh-cli-version: 2.67.0
 
     - name: 🐞 Debug context
       shell: bash
@@ -141,7 +143,7 @@ runs:
       run: ${{ inputs.action-path }}/start.sh
       shell: bash
       env:
-        WORKDIR: ${{ inputs.action-path }}
+        ACTION_WORKDIR: ${{ inputs.action-path }}
         SRC_PATH: ${{ github.workspace }}
         GH_TOKEN: ${{ inputs.github-token || github.token }}
         target_commit: "${{ inputs.target-commit }}"
