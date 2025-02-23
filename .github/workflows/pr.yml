@@ -19,7 +19,6 @@ jobs:
             with:
               target-commit: ${{ github.event.pull_request.base.sha }}
               source-commit: ${{ github.event.pull_request.head.sha }}
-              github-token: ${{ secrets.GH_TOKEN }}
               is-rc: "true" # Publish as a release candidate version
               is-draft: "true" # Publich as draft version
               build-metadata: ${{ github.workflow_sha }} # Optional build metadata
