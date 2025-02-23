@@ -4,6 +4,8 @@ on:
 jobs:
   pr-workflow:
       runs-on: ubuntu-latest
+      permissions:
+        contents: write
       steps:
          # This step is required
           - name: checkout source
