@@ -56,6 +56,12 @@ inputs:
   create-tag:
     description: "Create release tag after calculating it"
     default: "true"
+  create-major-tag:
+    description: "Create release major tag after calculating it"
+    default: "true"
+  create-latest-tag:
+    description: "Create release latest tag after calculating it"
+    default: "true"
   prerelease-tag:
     description: "Prerelease tag to add at the end of the version tag"
     default: ""
@@ -65,8 +71,10 @@ inputs:
   github-token:
     description: "Github Token to create the tag at the end of the process (required if want to create tag at the end)"
   action-path:
+    description: "Path to clone action scripts"
     required: false
     default: ./.github/actions/.auto-versioning
+  
 outputs:
   version_str:
     description: "version string"
@@ -162,6 +170,8 @@ runs:
         is_draft: "${{ inputs.is-draft }}"
         is_prerelease: "${{ inputs.is-prerelease }}"
         create_tag: "${{ inputs.create-tag }}"
+        create_major_tag: "${{ inputs.create-major-tag }}"
+        create_latest_tag: "${{ inputs.create-latest-tag }}"
         prerelease_tag: "${{ inputs.prerelease-tag }}"
         build_metadata: "${{ inputs.build-metadata }}"
         debug: "${{ inputs.debug }}"

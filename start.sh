@@ -17,6 +17,8 @@ is_draft=${is_draft:-false}
 is_prerelease=${is_prerelease:-false}
 debug=${debug:-false}
 create_tag=${create_tag:-true}
+create_major_tag=${create_major_tag:-true}
+create_latest_tag=${create_latest_tag:-true}
 prerelease_tag=${prerelease_tag:-}
 build_metadata=${build_metadata:-}
 
@@ -88,6 +90,14 @@ fi
 
 if [[ "$create_tag" == "true" ]]; then
     command_args+=" --create-tag"
+fi
+
+if [[ "$create_major_tag" == "true" ]]; then
+    command_args+=" --create-major-tag"
+fi
+
+if [[ "$create_latest_tag" == "true" ]]; then
+    command_args+=" --create-latest-tag"
 fi
 
 if [[ ${#importance_rate} -gt 0 ]]; then

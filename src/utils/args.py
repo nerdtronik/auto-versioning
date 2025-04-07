@@ -96,6 +96,16 @@ parser.add_argument(
     help="Create tag after calculating it",
 )
 parser.add_argument(
+    "--create-latest-tag",
+    action="store_true",
+    help="Create tag after calculating it",
+)
+parser.add_argument(
+    "--create-major-tag",
+    action="store_true",
+    help="Create tag after calculating it",
+)
+parser.add_argument(
     "--prerelease-tag",
     nargs="?",
     default="",

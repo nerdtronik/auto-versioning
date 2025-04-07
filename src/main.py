@@ -122,6 +122,20 @@ def main():
             draft=args.draft,
             prerelease=args.prerelease,
         )
+        if args.create_major_tag:
+            utils.create_version_tag(
+                version["major"] if args.remove_v_prefix else f'v{version["major"]}',
+                args.source_commit,
+                draft=args.draft,
+                prerelease=args.prerelease,
+        )
+        if args.create_latest_tag:
+            utils.create_version_tag(
+                "latest",
+                args.source_commit,
+                draft=args.draft,
+                prerelease=args.prerelease,
+        )
 
 
 if __name__ == "__main__":
