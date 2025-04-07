@@ -10,7 +10,7 @@ For example, if your current version is `v1.2.1` if you merge a pr with changes 
 <!-- start usage -->
 
 ```yaml
-- uses: HenryCabarcas/auto-versioning@v1.0.15
+- uses: HenryCabarcas/auto-versioning@v1
   with:
     # Commit to compare changes against (usually branch merging to or pr target)
     # This uses the commit id/sha
@@ -119,6 +119,16 @@ For example, if your current version is `v1.2.1` if you merge a pr with changes 
     #
     # Default: true
     create-tag: ""
+
+    # Create GitHub release tag on finish with only the major version (vX)
+    #
+    # Default: true
+    create-major-tag: ""
+
+    # Create GitHub latest release tag on finish
+    #
+    # Default: true
+    create-latest-tag: ""
 
     # Prerelease info to add at the end of the version tag
     # This is added as a suffix as '-prerelease-tag'
