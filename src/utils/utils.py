@@ -309,7 +309,7 @@ def calculate_version(
     return version, current_version
 
 
-def create_version_tag(tag: str, target: str = "", draft=False, prerelease=False):
+def create_version_tag(tag: str, target: str = "", draft=False, prerelease=False, latest=False, delete_if_exists=False):
     log.info("Creating version tag:", tag)
     command = ["gh", "release", "create", tag, "--generate-notes"]
     if len(target) > 0:
@@ -318,7 +318,11 @@ def create_version_tag(tag: str, target: str = "", draft=False, prerelease=False
         command.append("--draft")
     elif prerelease:
         command.append("--prerelease")
+    if latest:
+        command.append("--latest")
     log.debug("Create version tag command:\n", " ".join(command))
+    if delete_if_exists:
+        run_command(f"gh release delete {tag} --yes --cleanup-tag")
     result = run_command(" ".join(command))
     log.debug("Create version tag command result:\n", result)
     if not result:

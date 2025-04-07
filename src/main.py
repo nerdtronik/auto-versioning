@@ -128,6 +128,7 @@ def main():
                 args.source_commit,
                 draft=args.draft,
                 prerelease=args.prerelease,
+                delete_if_exists=True
         )
         if args.create_latest_tag:
             utils.create_version_tag(
@@ -135,6 +136,8 @@ def main():
                 args.source_commit,
                 draft=args.draft,
                 prerelease=args.prerelease,
+                delete_if_exists=True,
+                latest=True
         )
 
 
