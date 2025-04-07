@@ -133,7 +133,7 @@ def get_current_version():
         return default_ver
 
     results = json.loads(result)
-    results = list(filter(lambda x: x["isDraft"] == False and x["name"] is not "latest" and len(re.match(f"^(v|)\d\.\d\.\d",x["name"]))>0, results))
+    results = list(filter(lambda x: x["isDraft"] == False and x["name"] is not "latest" and re.match(r"^(v|)\d\.\d\.\d",x["name"]) is not None, results))
 
     date_strings = [item["publishedAt"] for item in results]
     date_format = "%Y-%m-%dT%H:%M:%SZ"
