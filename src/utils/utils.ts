@@ -1,7 +1,7 @@
 "use strict";
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { GitHub } from "@actions/github/lib/utils";
-import github from "@actions/github";
+import * as github from "@actions/github";
 import fs from "fs-extra";
 import path from "path";
 import readline from "readline";

@@ -1,5 +1,5 @@
 // import core from "@actions/core";
-import github from "@actions/github";
+import * as github from "@actions/github";
 import {
   getDiff,
   getFileList,
