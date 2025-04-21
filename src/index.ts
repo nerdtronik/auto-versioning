@@ -7,8 +7,8 @@ import {
   getLatestTag,
   parseGitIgnore,
   getFilesglob,
-} from "./utils/utils.js";
-import { log } from "./utils/logger.js";
+} from "./utils.js";
+import { log } from "./logger.js";
 
 log.level = "info";
 log.env = github.context.repo.repo;
