@@ -34,8 +34,8 @@ export async function parseGitIgnore() {
         (line, index) =>
           !/^#/.test(line) &&
           line.trim().length > 0 &&
-          lines.indexOf(line) === index
-      )
+          lines.indexOf(line) === index,
+      ),
     );
   }
   return res;
@@ -46,11 +46,11 @@ export async function getDiff(
   target: string = "",
   dir: string = ".",
   exclude: string[] = [],
-  include: string[] = []
+  include: string[] = [],
 ) {
   exclude = exclude.map((exc) => `':^${exc}'`.replaceAll("_", "*"));
   include = include.map((inc) =>
-    `'${dir}${path.sep}${inc}'`.replaceAll("_", "*")
+    `'${dir}${path.sep}${inc}'`.replaceAll("_", "*"),
   );
   if (source.length === 0) source = "";
   if (target.length === 0) target = "";
@@ -85,7 +85,7 @@ export async function getDiff(
 }
 
 export function countLines(
-  file: string | Buffer<ArrayBufferLike>
+  file: string | Buffer<ArrayBufferLike>,
 ): Promise<number> {
   return new Promise<number>((resolve) => {
     var inf = readline.createInterface({
@@ -108,7 +108,7 @@ type FileResponse = {
 export async function getFileList(
   ph: string,
   include: string[],
-  exclude: string[]
+  exclude: string[],
 ): Promise<FileResponse[]> {
   if (!fs.pathExistsSync(ph) || fs.lstatSync(ph).isFile()) return [];
   const fileList = fs.readdirSync(ph);
@@ -126,11 +126,11 @@ export async function getFileList(
         const nestRes = await getFileList(
           path.join(ph, path.basename(item)),
           include,
-          exclude
+          exclude,
         );
         res = res.concat(nestRes);
       }
-    })
+    }),
   );
   return res;
 }
@@ -194,7 +194,7 @@ export async function readInputs(): Promise<Inputs> {
     } else
       targetCommit = runCommand("git rev-parse FETCH_HEAD").replaceAll(
         "\n",
-        ""
+        "",
       );
   }
 
@@ -273,10 +273,10 @@ export async function getLatestTag(
   gh: InstanceType<typeof GitHub>,
   repo: { owner: string; repo: string },
   prereleaseSep: string = "-",
-  buildSep: string = "+"
+  buildSep: string = "+",
 ): Promise<Version> {
   const semverRegex = new RegExp(
-    `^v*(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:(-|\\${prereleaseSep})(?<prerelease>(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:(\\+|\\${buildSep})(?<buildMetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$`
+    `^v*(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:(-|\\${prereleaseSep})(?<prerelease>(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:(\\+|\\${buildSep})(?<buildMetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$`,
   );
 
   const tags = (await gh.rest.repos.listReleases(repo)).data.filter(
@@ -284,7 +284,7 @@ export async function getLatestTag(
       tag.draft === false &&
       tag.prerelease === false &&
       tag.tag_name !== "latest" &&
-      semverRegex.test(tag.tag_name)
+      semverRegex.test(tag.tag_name),
   );
 
   const latest = tags.reduce((a, b) => {

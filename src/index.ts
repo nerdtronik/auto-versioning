@@ -39,7 +39,7 @@ export async function run() {
     gh,
     github.context.repo,
     inputs.prereleaseSep,
-    inputs.buildSep
+    inputs.buildSep,
   );
 
   let diff = await getDiff(
@@ -47,7 +47,7 @@ export async function run() {
     inputs.targetCommit,
     inputs.dir,
     excludedFiles,
-    includedFiles
+    includedFiles,
   );
   log.info("diff");
   console.table(diff);

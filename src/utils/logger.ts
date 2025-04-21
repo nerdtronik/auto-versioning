@@ -106,7 +106,7 @@ export class Logger {
           return JSON.stringify(msg.map((item) => this.joinMessages(item)));
         if (typeof msg === "object") return JSON.stringify(msg, null, 2);
         return String(msg);
-      })
+      }),
     ).join(this.separator);
   }
 

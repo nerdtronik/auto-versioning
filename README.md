@@ -161,64 +161,62 @@ For example, if your current version is `v1.2.1` if you merge a pr with changes 
 
 ```yaml
 on:
-    pull_request:
-        branches: ["main"]
+  pull_request:
+    branches: ["main"]
 jobs:
-    pr-workflow:
-        runs-on: ubuntu-latest
-        steps:
-           # This step is required
-            - name: checkout source
-              uses: actions/checkout@v4
-              with:
-                fetch-depth: 2  # Fetch enough history to compare commits
+  pr-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      # This step is required
+      - name: checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Fetch enough history to compare commits
 
-            - name: Calculate Next Version
-              uses: HenryCabarcas/auto-versioning@v1.0.15
-              id: versioning
-              with:
-                target-commit: ${{ github.event.pull_request.base.sha }}
-                source-commit: ${{ github.event.pull_request.head.sha }}
-                github-token: ${{ secrets.GH_TOKEN }}
-                is-rc: "true" # Publish as a release candidate version
-                is-draft: "true" # Publich as draft version
-                build-metadata: ${{ github.workflow_sha }} # Optional build metadata
-                create-tag: "false" # Don't create tag, only returns at output
-                debug: "true" # Show debug messages
+      - name: Calculate Next Version
+        uses: HenryCabarcas/auto-versioning@v1.0.15
+        id: versioning
+        with:
+          target-commit: ${{ github.event.pull_request.base.sha }}
+          source-commit: ${{ github.event.pull_request.head.sha }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          is-rc: "true" # Publish as a release candidate version
+          is-draft: "true" # Publich as draft version
+          build-metadata: ${{ github.workflow_sha }} # Optional build metadata
+          create-tag: "false" # Don't create tag, only returns at output
+          debug: "true" # Show debug messages
 
-            - name: Show Output
-              run: echo '${{ toJson(steps.versioning.outputs) }}'
-
+      - name: Show Output
+        run: echo '${{ toJson(steps.versioning.outputs) }}'
 ```
 
 ### Push
 
 ```yaml
 on:
-    push:
-        branches: ["main"]
+  push:
+    branches: ["main"]
 jobs:
-    push-workflow:
-        runs-on: ubuntu-latest
-        steps:
-            # This step is required
-            - name: checkout source
-              uses: actions/checkout@master
-              with:
-                fetch-depth: 2  # Fetch enough history to compare commits
+  push-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      # This step is required
+      - name: checkout source
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 2 # Fetch enough history to compare commits
 
-            - name: Total Changes
-              uses: HenryCabarcas/auto-versioning@v1.0.15
-              id: versioning
-              with:
-                source-commit: ${{ github.event.after }}
-                # target-commit is not required here since is calculated
-                # on runtime based on the merge branch
-                github-token:  ${{ secrets.GH_TOKEN }}
+      - name: Total Changes
+        uses: HenryCabarcas/auto-versioning@v1.0.15
+        id: versioning
+        with:
+          source-commit: ${{ github.event.after }}
+          # target-commit is not required here since is calculated
+          # on runtime based on the merge branch
+          github-token: ${{ secrets.GH_TOKEN }}
 
-            - name: Show Output
-              run: echo '${{ toJson(steps.versioning.outputs) }}'
-
+      - name: Show Output
+        run: echo '${{ toJson(steps.versioning.outputs) }}'
 ```
 
 ### Static commit merge
