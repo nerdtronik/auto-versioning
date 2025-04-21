@@ -1,0 +1,39 @@
+{
+  "name": "auto-versioning",
+  "version": "1.0.0",
+  "description": "This actions calculates your repo versioning tags based on [Semantic Versioning 2.0.0 | Semantic Versioning](https://semver.org/spec/v2.0.0.html) syntaxis, it calculates to change major, minor and patch version based on a percentage of changes between commits. For example, if your current version is `v1.2.1` if you merge a pr with changes of 75%, your next version will be a major version, resulting in `v2.0.0`, but if the changes are 30%, your next version will be `v1.3.0`, and so on. These thresholds can be modified with the instructions below.",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "ncc build src/index.ts",
+    "test": "time npx @github/local-action . src/index.ts .env.test",
+    "test-prd": "time npx @github/local-action . dist/index.js .env.test",
+    "start": "npx ts-node src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nerdtronik/auto-versioning.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nerdtronik/auto-versioning/issues"
+  },
+  "homepage": "https://github.com/nerdtronik/auto-versioning#readme",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0",
+    "@actions/glob": "^0.5.0",
+    "fs-extra": "^11.3.0",
+    "simple-git": "^3.27.0"
+  },
+  "devDependencies": {
+    "@github/local-action": "^3.2.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.14.1",
+    "@vercel/ncc": "^0.38.3",
+    "eslint": "^9.25.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
