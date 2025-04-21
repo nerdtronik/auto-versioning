@@ -89,6 +89,7 @@ inputs:
     default: "+"
   github-token:
     description: "Github Token to create the tag at the end of the process (required if want to create tag at the end)"
+    default: ${{ secrets.GITHUB_TOKEN }}
 
 outputs:
   version_str:
