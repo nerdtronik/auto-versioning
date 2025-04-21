@@ -42586,8 +42586,10 @@ async function readInputs() {
     const buildSep = coreExports.getInput("build-separator");
     const excludeGitignore = coreExports.getBooleanInput("exclude-gitignore");
     let githubToken = coreExports.getInput("github-token");
-    // if (githubToken.length === 0 && !process.env.TEST)
-    //   githubToken = process.env.GITHUB_TOKEN ?? "";
+    if (githubToken.length === 0 && process.env.TEST)
+        githubToken = fs.readFileSync(".github.token").toString();
+    else if (githubToken.length === 0)
+        coreExports.setFailed("No GITHUB TOKEN provided, sadly is required to continue");
     return {
         dir,
         exclude,

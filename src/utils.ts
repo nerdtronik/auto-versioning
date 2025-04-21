@@ -225,8 +225,10 @@ export async function readInputs(): Promise<Inputs> {
   const excludeGitignore = core.getBooleanInput("exclude-gitignore");
   let githubToken = core.getInput("github-token");
 
-  // if (githubToken.length === 0 && !process.env.TEST)
-  //   githubToken = process.env.GITHUB_TOKEN ?? "";
+  if (githubToken.length === 0 && process.env.TEST)
+    githubToken = fs.readFileSync(".github.token").toString();
+  else if (githubToken.length === 0)
+    core.setFailed("No GITHUB TOKEN provided, sadly is required to continue");
 
   return {
     dir,
