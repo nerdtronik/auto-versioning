@@ -2,6 +2,7 @@ name: "Automatic Versioning Tag"
 branding:
   icon: "git-branch"
   color: "black"
+
 description: "Calculate your next version tag based on file changes automatically using SemVer v2.0.0 syntax"
 inputs:
   target-commit:
