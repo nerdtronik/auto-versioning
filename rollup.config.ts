@@ -13,7 +13,10 @@ const config = {
     sourcemap: true,
   },
   plugins: [
-    typescript(),
+    typescript({
+      filterRoot: false,
+      tsconfig: "./tsconfig.json",
+    }),
     nodeResolve({
       preferBuiltins: true,
       modulePaths: ["src/utils", "src"],
