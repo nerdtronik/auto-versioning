@@ -66,3 +66,5 @@ export async function run() {
   log.info("Total lines in project (before):", totalLines);
   log.info("Total files in project:", files.length);
 }
+
+run();
