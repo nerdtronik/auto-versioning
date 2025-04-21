@@ -138,4 +138,4 @@ outputs:
 
 runs:
   using: "node20"
-  main: "src/dist/index.js"
+  main: "dist/index.js"
