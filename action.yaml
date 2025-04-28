@@ -2,13 +2,12 @@ name: "Automatic Versioning Tag"
 branding:
   icon: "git-branch"
   color: "black"
-
 description: "Calculate your next version tag based on file changes automatically using SemVer v2.0.0 syntax"
 inputs:
   target-commit:
     description: "Commit to compare changes against (usually branch merging to)"
     required: false
-    default: ${{  github.event.pull_request.base.sha || github.event.before }}
+    default: ${{ github.event.pull_request.base.sha || github.event.before }}
   source-commit:
     description: "Commit to compare changes to target-commit (usually pr branch to merge)"
     required: false
@@ -91,7 +90,6 @@ inputs:
   github-token:
     description: "Github Token to create the tag at the end of the process (required if want to create tag at the end)"
     default: ${{ github.token }}
-
 outputs:
   version_str:
     description: "version string"
@@ -138,7 +136,6 @@ outputs:
   cumulative-change-percentage:
     description: The sum of all change percentages between commits
     value: ${{ steps.main-process.outputs.cumulative_percentage }}
-
 runs:
   using: "node20"
   main: "dist/index.js"

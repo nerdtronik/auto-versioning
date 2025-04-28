@@ -27,7 +27,7 @@ export async function run() {
   } else if (github.context.eventName === "pull_request") {
     payload = github.context.payload as PullRequestEvent;
   }
-  
+
   const inputs = await readInputs();
   if (inputs.debug) log.level = "debug";
   log.debug(inputs);
@@ -70,12 +70,14 @@ export async function run() {
   const include = await getFilesglob(includedFiles);
   const files = await getFileList(inputs.dir, include, exclude);
   let totalLines = 0;
-  files.forEach((file) => {
-    totalLines += file.lines;
-  });
+  for (var i = 0; i < files.length; i++){
+    const file = files[i]
+    totalLines+=file.lines
+  }
+
 
   log.info("Total lines in project (now):", totalLines);
-  totalLines = totalLines - diff.insertions + diff.deletions;
+  totalLines = totalLines - Math.abs(diff.insertions) + Math.abs(diff.deletions);
   log.info("Total lines in project (before):", totalLines);
   log.info("Total files in project:", files.length);
 }

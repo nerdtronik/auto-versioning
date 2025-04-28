@@ -42438,7 +42438,7 @@ init_git_response_error();
 var simpleGit = gitInstanceFactory;
 
 const git = simpleGit();
-const changesRegex = /\s+(?<files_changed>\d+)\s+file(|s) changed((,|)\s+(?<insertions>\d+)\s+insertion(s|)\(\+\)|)((,|)\s+(?<deletions>\d+)\s+deletion(s|)\(-\)|)/g;
+const changesRegex = /\s+(?<files_changed>\d+)\s+file(?:|s)\s+changed(?:(?:,|)\s+(?<insertions>\d+)\s+insertion(?:s|)\(\+\)|)(?:(?:,|)\s+(?<deletions>\d+)\s+deletion(?:s|)\(-\)|)/gm;
 async function getFilesglob(glob) {
     const g = await globExports.create(glob.join("\n"), {
         omitBrokenSymbolicLinks: true,
@@ -42476,9 +42476,11 @@ async function getDiff(source = "", target = "", dir = ".", exclude = [], includ
         include.length === 0 ? dir : "",
         ...include,
         ...exclude,
+        ":^.gitignore"
     ]);
     const diff = await git.diff(options);
     const changes = changesRegex.exec(diff)?.groups ?? {};
+    console.log(changes);
     const deleted_files = diff.match(/\s+delete\s+mode/g)?.length ?? 0;
     const created_files = diff.match(/\s+create\s+mode/g)?.length ?? 0;
     const res = {
@@ -42552,17 +42554,7 @@ async function readInputs() {
         .split(",")
         .filter((item) => item.trim().length > 0);
     let sourceCommit = coreExports.getInput("source-commit");
-    // if (sourceCommit.length === 0) {
-    //   if (github.context.eventName === "push") {
-    //     sourceCommit = payload.event.after
-    //   } else sourceCommit = runCommand("git rev-parse HEAD").replaceAll("\n", "");
-    // }
     let targetCommit = coreExports.getInput("target-commit");
-    // if (targetCommit.length === 0) {
-    //   if (github.context.eventName === "push") {
-    //     targetCommit = runCommand("git rev-parse HEAD^1").replaceAll("\n", "");
-    //   } else targetCommit = runCommand("git rev-parse HEAD").replaceAll("\n", "");
-    // }
     let patchLimit = Number(coreExports.getInput("patch-limit"));
     if (patchLimit === 0)
         patchLimit = 10;
@@ -42782,11 +42774,12 @@ async function run() {
     const include = await getFilesglob(includedFiles);
     const files = await getFileList(inputs.dir, include, exclude);
     let totalLines = 0;
-    files.forEach((file) => {
+    for (var i = 0; i < files.length; i++) {
+        const file = files[i];
         totalLines += file.lines;
-    });
+    }
     log.info("Total lines in project (now):", totalLines);
-    totalLines = totalLines - diff.insertions + diff.deletions;
+    totalLines = totalLines - Math.abs(diff.insertions) + Math.abs(diff.deletions);
     log.info("Total lines in project (before):", totalLines);
     log.info("Total files in project:", files.length);
 }

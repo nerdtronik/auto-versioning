@@ -27,6 +27,5 @@ jobs:
           create-tag: "false" # Don't create tag, only returns at output
           debug: "true" # Show debug messages
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Show Output
         run: echo '${{ toJson(steps.versioning.outputs) }}'

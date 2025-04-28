@@ -12,7 +12,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 2 # Fetch enough history to compare commits
-
       - name: Calculate Next Version
         uses: ./
         id: versioning
@@ -20,6 +19,5 @@ jobs:
           source-commit: ${{ github.event.after }}
           # target-commit is not required here since is calculated
           # on runtime based on the merge branch
-
       - name: Show Output
         run: echo '${{ toJson(steps.versioning.outputs) }}'

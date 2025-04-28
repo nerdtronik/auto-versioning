@@ -15,7 +15,7 @@ import { simpleGit } from "simple-git";
 const git = simpleGit();
 
 const changesRegex: RegExp =
-  /\s+(?<files_changed>\d+)\s+file(|s) changed((,|)\s+(?<insertions>\d+)\s+insertion(s|)\(\+\)|)((,|)\s+(?<deletions>\d+)\s+deletion(s|)\(-\)|)/g;
+  /\s+(?<files_changed>\d+)\s+file(?:|s)\s+changed(?:(?:,|)\s+(?<insertions>\d+)\s+insertion(?:s|)\(\+\)|)(?:(?:,|)\s+(?<deletions>\d+)\s+deletion(?:s|)\(-\)|)/gm;
 
 export function runCommand(cmd: string): string {
   return execSync(cmd).toString();
@@ -71,10 +71,12 @@ export async function getDiff(
     include.length === 0 ? dir : "",
     ...include,
     ...exclude,
+    ":^.gitignore"
   ]);
 
   const diff = await git.diff(options);
   const changes = changesRegex.exec(diff)?.groups ?? {};
+  console.log(changes);
   const deleted_files = diff.match(/\s+delete\s+mode/g)?.length ?? 0;
   const created_files = diff.match(/\s+create\s+mode/g)?.length ?? 0;
 
@@ -197,18 +199,9 @@ export async function readInputs(): Promise<Inputs> {
     .getInput("important-files")
     .split(",")
     .filter((item) => item.trim().length > 0);
+
   let sourceCommit = core.getInput("source-commit");
-  // if (sourceCommit.length === 0) {
-  //   if (github.context.eventName === "push") {
-  //     sourceCommit = payload.event.after
-  //   } else sourceCommit = runCommand("git rev-parse HEAD").replaceAll("\n", "");
-  // }
   let targetCommit = core.getInput("target-commit");
-  // if (targetCommit.length === 0) {
-  //   if (github.context.eventName === "push") {
-  //     targetCommit = runCommand("git rev-parse HEAD^1").replaceAll("\n", "");
-  //   } else targetCommit = runCommand("git rev-parse HEAD").replaceAll("\n", "");
-  // }
 
   let patchLimit = Number(core.getInput("patch-limit"));
   if (patchLimit === 0) patchLimit = 10;

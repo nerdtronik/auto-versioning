@@ -52,7 +52,16 @@ def get_files_list(base_dir: str, exclude: list[str] = [], only: list[str] = [])
     items = os.listdir(base_dir)
     for item in items:
         item = os.path.join(base_dir, item)
-        if any(ex == os.path.basename(os.path.dirname(item)) for ex in [".git", ".venv", "__pycache__",".auto-versioning",os.getenv("ACTION_WORKDIR")]):
+        if any(
+            ex == os.path.basename(os.path.dirname(item))
+            for ex in [
+                ".git",
+                ".venv",
+                "__pycache__",
+                ".auto-versioning",
+                os.getenv("ACTION_WORKDIR"),
+            ]
+        ):
             log.debug(item, "dir excluded by default")
             continue
         if any(ex == os.path.basename(item) for ex in ["gh_tar"]):
@@ -133,7 +142,14 @@ def get_current_version():
         return default_ver
 
     results = json.loads(result)
-    results = list(filter(lambda x: x["isDraft"] == False and x["name"] is not "latest" and re.match(r"^(v|)\d\.\d\.\d",x["name"]) is not None, results))
+    results = list(
+        filter(
+            lambda x: x["isDraft"] == False
+            and x["name"] is not "latest"
+            and re.match(r"^(v|)\d\.\d\.\d", x["name"]) is not None,
+            results,
+        )
+    )
 
     date_strings = [item["publishedAt"] for item in results]
     date_format = "%Y-%m-%dT%H:%M:%SZ"
@@ -285,9 +301,9 @@ def calculate_version(
             and "beta" not in prerelease_tag
             and "rc" not in prerelease_tag
         ):
-            current_version["prerelease"] = (
-                f'{current_version["prerelease"]}-{prerelease_tag}'
-            )
+            current_version[
+                "prerelease"
+            ] = f'{current_version["prerelease"]}-{prerelease_tag}'
     if (
         current_version["major"] == 0
         and current_version["minor"] == 0
@@ -309,7 +325,14 @@ def calculate_version(
     return version, current_version
 
 
-def create_version_tag(tag: str, target: str = "", draft=False, prerelease=False, latest=False, delete_if_exists=False):
+def create_version_tag(
+    tag: str,
+    target: str = "",
+    draft=False,
+    prerelease=False,
+    latest=False,
+    delete_if_exists=False,
+):
     log.info("Creating version tag:", tag)
     command = ["gh", "release", "create", tag, "--generate-notes"]
     if len(target) > 0:
