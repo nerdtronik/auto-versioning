@@ -42765,13 +42765,13 @@ async function run() {
     log.info("Analizying directory:", inputs.dir);
     const gh = githubExports.getOctokit(inputs.githubToken);
     const latestTag = await getLatestTag(gh, githubExports.context.repo, inputs.prereleaseSep, inputs.buildSep);
-    let diff = await getDiff(inputs.sourceCommit, inputs.targetCommit, inputs.dir, excludedFiles, includedFiles);
+    const exclude = await getFilesglob(excludedFiles);
+    const include = await getFilesglob(includedFiles);
+    let diff = await getDiff(inputs.sourceCommit, inputs.targetCommit, inputs.dir, exclude, include);
     log.info("diff");
     console.table(diff);
     log.info("latest tag:", latestTag.tagString);
     console.table(latestTag);
-    const exclude = await getFilesglob(excludedFiles);
-    const include = await getFilesglob(includedFiles);
     const files = await getFileList(inputs.dir, include, exclude);
     let totalLines = 0;
     for (var i = 0; i < files.length; i++) {
