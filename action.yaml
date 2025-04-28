@@ -8,11 +8,11 @@ inputs:
   target-commit:
     description: "Commit to compare changes against (usually branch merging to)"
     required: false
-    default: ${{ github.event.before || github.sha }}
+    default: ${{  github.event.pull_request.base.sha || github.event.before }}
   source-commit:
     description: "Commit to compare changes to target-commit (usually pr branch to merge)"
     required: false
-    default: ${{ github.event.after || github.event.pull_request.head.sha }}
+    default: ${{ github.event.pull_request.head.sha || github.event.after }}
   patch-limit:
     description: "Top how many % of changes limit to increase a patch version vA.B.(C+1)"
     default: 10
