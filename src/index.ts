@@ -19,7 +19,7 @@ log.env = github.context.repo.repo;
 log.showDate = false;
 
 export async function run() {
-  let payload: PushEvent | PullRequestEvent = undefined;
+  let payload: PushEvent | PullRequestEvent;
   if (github.context.eventName === "push") {
     payload = github.context.payload as PushEvent;
     payload

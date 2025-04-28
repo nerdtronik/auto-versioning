@@ -173,13 +173,15 @@ type Inputs = {
 };
 
 export async function readInputs(): Promise<Inputs> {
-  let payload: PushEvent | PullRequestEvent = undefined;
+  let payload: PushEvent | PullRequestEvent;
   if (github.context.eventName === "push") {
     payload = github.context.payload as PushEvent;
     payload;
     core.info(`The head commit is: ${payload.head_commit}`);
+    console.log(payload);
   } else if (github.context.eventName === "pull_request") {
     payload = github.context.payload as PullRequestEvent;
+    console.log(payload);
   }
   let dir = core.getInput("directory");
   if (dir.length === 0) dir = path.resolve(".");
@@ -281,12 +283,6 @@ type Version = {
   buildMetadata?: string;
 };
 
-type Tag = {
-  draft: boolean;
-  prerelease: boolean;
-  tag_name: string;
-  created_at: string;
-};
 
 export async function getLatestTag(
   gh: InstanceType<typeof GitHub>,
@@ -299,14 +295,14 @@ export async function getLatestTag(
   );
 
   const tags = (await gh.rest.repos.listReleases(repo)).data.filter(
-    (tag: Tag) =>
+    (tag: any) =>
       tag.draft === false &&
       tag.prerelease === false &&
       tag.tag_name !== "latest" &&
       semverRegex.test(tag.tag_name)
   );
 
-  const latest = tags.reduce((a: Tag, b: Tag) => {
+  const latest = tags.reduce((a: any, b: any) => {
     return new Date(a.created_at) > new Date(b.created_at) ? a : b;
   });
   const tagDescription = semverRegex.exec(latest.tag_name)?.groups;
