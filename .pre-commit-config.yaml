@@ -1,0 +1,45 @@
+repos:
+  - repo: local
+    hooks:
+      - id: build
+        name: TS - Build dist
+        entry: bash -c 'npm run package'
+        language: system
+        pass_filenames: false
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0 # Use the ref you want to point at
+    hooks:
+      - name: SHELL - Check shebangs
+        id: check-executables-have-shebangs
+        stages: [pre-push]
+      - name: GIT - Check merge conflicts
+        id: check-merge-conflict
+        stages: [pre-push]
+      - name: GIT - Check for private Keys
+        id: detect-private-key
+      - name: GIT - End of file verifier
+        id: end-of-file-fixer
+        stages: [pre-push]
+      - name: GIT - No commit to main branch
+        id: no-commit-to-branch
+        args:
+          - --branch
+          - main
+      - name: GIT - Remove trailing whitespaces
+        id: trailing-whitespace
+        stages: [pre-push]
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - name: ACTIONS - Action Workflows lint
+        id: actionlint
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.16.0
+    hooks:
+      - name: YAML - Lint
+        id: yamlfmt
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.3
+    hooks:
+      - name: SECURITY - Check for security leaks
+        id: gitleaks
