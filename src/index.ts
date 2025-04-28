@@ -80,4 +80,4 @@ export async function run() {
   log.info("Total files in project:", files.length);
 }
 
-// run();
+run();

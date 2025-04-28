@@ -8,7 +8,7 @@ inputs:
   target-commit:
     description: "Commit to compare changes against (usually branch merging to)"
     required: false
-    default: ${{ github.event.before || github.event.pull_request.base.sha }}
+    default: ${{ github.event.before || ggithub.sha }}
   source-commit:
     description: "Commit to compare changes to target-commit (usually pr branch to merge)"
     required: false
