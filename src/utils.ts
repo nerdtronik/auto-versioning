@@ -1,13 +1,17 @@
 "use strict";
 import * as core from "@actions/core";
-import { GitHub } from "@actions/github/lib/utils";
 import * as github from "@actions/github";
+import { GitHub } from "@actions/github/lib/utils";
+import { create as createGlob } from "@actions/glob";
+import {
+  PullRequestEvent,
+  PushEvent,
+} from "@octokit/webhooks-definitions/schema";
+import { execSync } from "child_process";
 import fs from "fs-extra";
 import path from "path";
 import readline from "readline";
 import { simpleGit } from "simple-git";
-import { execSync } from "child_process";
-import { create as createGlob } from "@actions/glob";
 const git = simpleGit();
 
 const changesRegex: RegExp =
@@ -18,7 +22,9 @@ export function runCommand(cmd: string): string {
 }
 
 export async function getFilesglob(glob: string[]): Promise<string[]> {
-  const g = await createGlob(glob.join("\n"));
+  const g = await createGlob(glob.join("\n"), {
+    omitBrokenSymbolicLinks: true,
+  });
   return await g.glob();
 }
 
@@ -32,10 +38,10 @@ export async function parseGitIgnore() {
     res = res.concat(
       lines.filter(
         (line, index) =>
-          !/^#/.test(line) &&
+          !/^(#|\/)/.test(line) &&
           line.trim().length > 0 &&
-          lines.indexOf(line) === index,
-      ),
+          lines.indexOf(line) === index
+      )
     );
   }
   return res;
@@ -46,11 +52,11 @@ export async function getDiff(
   target: string = "",
   dir: string = ".",
   exclude: string[] = [],
-  include: string[] = [],
+  include: string[] = []
 ) {
   exclude = exclude.map((exc) => `':^${exc}'`.replaceAll("_", "*"));
   include = include.map((inc) =>
-    `'${dir}${path.sep}${inc}'`.replaceAll("_", "*"),
+    `'${dir}${path.sep}${inc}'`.replaceAll("_", "*")
   );
   if (source.length === 0) source = "";
   if (target.length === 0) target = "";
@@ -80,12 +86,12 @@ export async function getDiff(
     deletions: Number(changes.deletions ?? 0),
   };
 
-  core.debug(JSON.stringify(res));
+  // core.debug(JSON.stringify(res));
   return res;
 }
 
 export function countLines(
-  file: string | Buffer<ArrayBufferLike>,
+  file: string | Buffer<ArrayBufferLike>
 ): Promise<number> {
   return new Promise<number>((resolve) => {
     var inf = readline.createInterface({
@@ -108,7 +114,7 @@ type FileResponse = {
 export async function getFileList(
   ph: string,
   include: string[],
-  exclude: string[],
+  exclude: string[]
 ): Promise<FileResponse[]> {
   if (!fs.pathExistsSync(ph) || fs.lstatSync(ph).isFile()) return [];
   const fileList = fs.readdirSync(ph);
@@ -126,11 +132,11 @@ export async function getFileList(
         const nestRes = await getFileList(
           path.join(ph, path.basename(item)),
           include,
-          exclude,
+          exclude
         );
         res = res.concat(nestRes);
       }
-    }),
+    })
   );
   return res;
 }
@@ -167,6 +173,14 @@ type Inputs = {
 };
 
 export async function readInputs(): Promise<Inputs> {
+  let payload: PushEvent | PullRequestEvent = undefined;
+  if (github.context.eventName === "push") {
+    payload = github.context.payload as PushEvent;
+    payload;
+    core.info(`The head commit is: ${payload.head_commit}`);
+  } else if (github.context.eventName === "pull_request") {
+    payload = github.context.payload as PullRequestEvent;
+  }
   let dir = core.getInput("directory");
   if (dir.length === 0) dir = path.resolve(".");
   const exclude = core
@@ -182,21 +196,17 @@ export async function readInputs(): Promise<Inputs> {
     .split(",")
     .filter((item) => item.trim().length > 0);
   let sourceCommit = core.getInput("source-commit");
-  if (sourceCommit.length === 0) {
-    if (github.context.eventName === "push") {
-      sourceCommit = runCommand("git rev-parse HEAD^2").replaceAll("\n", "");
-    } else sourceCommit = runCommand("git rev-parse HEAD").replaceAll("\n", "");
-  }
+  // if (sourceCommit.length === 0) {
+  //   if (github.context.eventName === "push") {
+  //     sourceCommit = payload.event.after
+  //   } else sourceCommit = runCommand("git rev-parse HEAD").replaceAll("\n", "");
+  // }
   let targetCommit = core.getInput("target-commit");
-  if (targetCommit.length === 0) {
-    if (github.context.eventName === "push") {
-      targetCommit = runCommand("git rev-parse HEAD^1").replaceAll("\n", "");
-    } else
-      targetCommit = runCommand("git rev-parse FETCH_HEAD").replaceAll(
-        "\n",
-        "",
-      );
-  }
+  // if (targetCommit.length === 0) {
+  //   if (github.context.eventName === "push") {
+  //     targetCommit = runCommand("git rev-parse HEAD^1").replaceAll("\n", "");
+  //   } else targetCommit = runCommand("git rev-parse HEAD").replaceAll("\n", "");
+  // }
 
   let patchLimit = Number(core.getInput("patch-limit"));
   if (patchLimit === 0) patchLimit = 10;
@@ -271,25 +281,32 @@ type Version = {
   buildMetadata?: string;
 };
 
+type Tag = {
+  draft: boolean;
+  prerelease: boolean;
+  tag_name: string;
+  created_at: string;
+};
+
 export async function getLatestTag(
   gh: InstanceType<typeof GitHub>,
   repo: { owner: string; repo: string },
   prereleaseSep: string = "-",
-  buildSep: string = "+",
+  buildSep: string = "+"
 ): Promise<Version> {
   const semverRegex = new RegExp(
-    `^v*(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:(-|\\${prereleaseSep})(?<prerelease>(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:(\\+|\\${buildSep})(?<buildMetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$`,
+    `^v*(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:(-|\\${prereleaseSep})(?<prerelease>(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:(\\+|\\${buildSep})(?<buildMetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$`
   );
 
   const tags = (await gh.rest.repos.listReleases(repo)).data.filter(
-    (tag) =>
+    (tag: Tag) =>
       tag.draft === false &&
       tag.prerelease === false &&
       tag.tag_name !== "latest" &&
-      semverRegex.test(tag.tag_name),
+      semverRegex.test(tag.tag_name)
   );
 
-  const latest = tags.reduce((a, b) => {
+  const latest = tags.reduce((a: Tag, b: Tag) => {
     return new Date(a.created_at) > new Date(b.created_at) ? a : b;
   });
   const tagDescription = semverRegex.exec(latest.tag_name)?.groups;

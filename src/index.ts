@@ -1,5 +1,9 @@
-// import core from "@actions/core";
+import * as core from "@actions/core";
 import * as github from "@actions/github";
+import {
+  PushEvent,
+  PullRequestEvent,
+} from "@octokit/webhooks-definitions/schema";
 import {
   getDiff,
   getFileList,
@@ -15,6 +19,15 @@ log.env = github.context.repo.repo;
 log.showDate = false;
 
 export async function run() {
+  let payload: PushEvent | PullRequestEvent = undefined;
+  if (github.context.eventName === "push") {
+    payload = github.context.payload as PushEvent;
+    payload
+    core.info(`The head commit is: ${payload.head_commit}`);
+  } else if (github.context.eventName === "pull_request") {
+    payload = github.context.payload as PullRequestEvent;
+  }
+  
   const inputs = await readInputs();
   if (inputs.debug) log.level = "debug";
   log.debug(inputs);
@@ -39,7 +52,7 @@ export async function run() {
     gh,
     github.context.repo,
     inputs.prereleaseSep,
-    inputs.buildSep,
+    inputs.buildSep
   );
 
   let diff = await getDiff(
@@ -47,7 +60,7 @@ export async function run() {
     inputs.targetCommit,
     inputs.dir,
     excludedFiles,
-    includedFiles,
+    includedFiles
   );
   log.info("diff");
   console.table(diff);
@@ -67,4 +80,4 @@ export async function run() {
   log.info("Total files in project:", files.length);
 }
 
-run();
+// run();
