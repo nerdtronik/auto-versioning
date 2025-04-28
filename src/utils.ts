@@ -75,6 +75,7 @@ export async function getDiff(
   ]);
 
   const diff = await git.diff(options);
+  console.log(diff)
   const changes = changesRegex.exec(diff)?.groups ?? {};
   console.log(changes);
   const deleted_files = diff.match(/\s+delete\s+mode/g)?.length ?? 0;
