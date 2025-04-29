@@ -292,7 +292,6 @@ export async function getLatestTag(
       semverRegex.test(tag.tag_name)
   );
 
-  log.debug(tags);
   const latest = tags.reduce((a: any, b: any) => {
     return new Date(a.published_at) > new Date(b.published_at) ? a : b;
   });
@@ -547,7 +546,7 @@ async function createorUpdateTag(
   } catch (e) {
     log.info("Failed to update tag", tag, "trying to create it");
   }
-
+  log.info(tag, isDraft,isPrerelease);
   const res = await gh.request(`POST /repos/{owner}/{repo}/releases`, {
     ...github.context.repo,
     tag_name: tag,
