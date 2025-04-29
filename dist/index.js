@@ -42747,6 +42747,8 @@ function updateTag(maxChange, currentTag, inputs) {
         is_oneof = inputs.keyBeta;
     else if (currentTag.prerelease?.includes(inputs.keyRc))
         is_oneof = inputs.keyRc;
+    else if (currentTag.prerelease?.includes(inputs.prereleaseTag))
+        is_oneof = inputs.prereleaseTag;
     if (inputs.isAlpha === true) {
         increase = inputs.keyAlpha === is_oneof;
         is_oneof = inputs.keyAlpha;
@@ -42759,6 +42761,10 @@ function updateTag(maxChange, currentTag, inputs) {
         increase = inputs.keyRc === is_oneof;
         is_oneof = inputs.keyRc;
     }
+    else if (inputs.prereleaseTag.length > 0) {
+        increase = inputs.prereleaseTag == is_oneof;
+        is_oneof = inputs.prereleaseTag;
+    }
     else
         is_oneof = "";
     if (is_oneof.length > 0) {
@@ -42768,6 +42774,7 @@ function updateTag(maxChange, currentTag, inputs) {
                 ?.replace(inputs.keyAlpha, "")
                 .replace(inputs.keyBeta, "")
                 .replace(inputs.keyRc, "")
+                .replace(inputs.prereleaseTag, "")
                 .split(inputs.versionSep)[1] ?? 0) + 1);
         }
         prerelease = `${is_oneof}${currentPreVersion.length > 0 ? inputs.versionSep : ""}${currentPreVersion}`;
