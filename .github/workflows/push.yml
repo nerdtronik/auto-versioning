@@ -1,25 +1,24 @@
 on:
   push:
-      branches: ["main"]
+    branches: ["main"]
 jobs:
   push-workflow:
-      runs-on: ubuntu-latest
-      permissions:
-        contents: write
-      steps:
-          # This step is required
-          - name: checkout source
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 2  # Fetch enough history to compare commits
-
-          - name: Calculate Next Version
-            uses: ./
-            id: versioning
-            with:
-              source-commit: ${{ github.event.after }}
-              # target-commit is not required here since is calculated
-              # on runtime based on the merge branch
-
-          - name: Show Output
-            run: echo '${{ toJson(steps.versioning.outputs) }}'
+    name: 🐦 Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # This step is required
+      - name: checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Fetch enough history to compare commits
+      - name: Calculate Next Version
+        uses: ./
+        id: versioning
+        # with:
+        # source-commit: ${{ github.event.after }}
+        # target-commit is not required here since is calculated
+        # on runtime based on the merge branch
+      - name: Show Output
+        run: echo '${{ toJson(steps.versioning.outputs) }}'

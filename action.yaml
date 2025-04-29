@@ -1,80 +1,101 @@
 name: "Automatic Versioning Tag"
 branding:
-  icon: 'git-branch'
-  color: 'black'
+  icon: "git-branch"
+  color: "black"
 description: "Calculate your next version tag based on file changes automatically using SemVer v2.0.0 syntax"
 inputs:
   target-commit:
     description: "Commit to compare changes against (usually branch merging to)"
-    required: true
-    default: ""
+    required: false
+    default: ${{ github.event.pull_request.base.sha || github.event.before }}
   source-commit:
     description: "Commit to compare changes to target-commit (usually pr branch to merge)"
-    required: true
+    required: false
+    default: ${{ github.event.pull_request.head.sha || github.event.after }}
   patch-limit:
-    description: "Top how many % of changes limit to increase a patch version vX.Y.(Z+1)"
-    default: "10"
+    description: "Top how many % of changes limit to increase a patch version vA.B.(C+1)"
+    default: 10
   minor-limit:
-    description: "Top how many % of changes limit to increase a minor version vX.(Y+1).Z"
-    default: "75"
+    description: "Top how many % of changes limit to increase a minor version vA.(B+1).C"
+    default: 75
   directory:
     description: "Base directory to check the changes"
     default: "."
   exclude:
-    description: "List of files, paths, patterns (./*path*) to exclude from changes checking (space separated)"
+    description: "List of files, paths, patterns (./*path*) to exclude from changes checking (comma separated)"
     default: ""
-  include-only:
-    description: "List of files, paths, patterns (./*path*) to include only for changes checking (space separated)"
+  include:
+    description: "List of files, paths, patterns (./*path*) to include only for changes checking (comma separated)"
     default: ""
-  important-files:
-    description: "List of files, paths, patterns (./*path*) to mark as important for changes checking (space separated)"
-    default: ""
-  importance-rate:
-    description: "How important an important file will be (default 1.1)"
-    default: "1.1"
+  exclude-gitignore:
+    description: "Parse gitignore files to exlude comparing files based on the content of those gitinores (default true)"
+    default: true
+  # important-files:
+  #   description: "List of files, paths, patterns (./*path*) to mark as important for changes checking (comma separated)"
+  #   default: ""
+  # importance-rate:
+  #   description: "How important an important file will be (default 1.1)"
+  # default: 1.1
   v-prefix:
-    description: "Include the 'v' prefix in the version tag: vX.Y.Z"
-    default: "true"
+    description: "Include the 'v' prefix in the version tag: vA.B.C"
+    default: true
   is-alpha:
     description: "Mark this version as an alpha"
-    default: "false"
+    default: false
   is-beta:
     description: "Mark this version as a beta"
-    default: "false"
+    default: false
   is-rc:
     description: "Mark this version as a release candidate"
-    default: "false"
+    default: false
   is-draft:
     description: "Mark this version as a draft"
-    default: "false"
+    default: false
   is-prerelease:
     description: "Mark this version as a prerelease"
-    default: "false"
+    default: false
+  alpha-key:
+    description: "Text to put if the version is alpha (default 'alpha')"
+    default: "alpha"
+  beta-key:
+    description: "Text to put if the version is beta (default 'beta')"
+    default: "beta"
+  rc-key:
+    description: "Text to put if the version is rc (default 'rc')"
+    default: "rc"
   debug:
     description: "Show debug messages"
-    default: "false"
+    default: false
   create-tag:
     description: "Create release tag after calculating it"
-    default: "true"
+    default: true
   create-major-tag:
-    description: "Create release major tag after calculating it"
-    default: "true"
+    description: "Create release major tag after calculating it. (Ex. v3)"
+    default: true
+  create-minor-tag:
+    description: "Create release minor tag after calculating it. (Ex. v3.1)"
+    default: true
   create-latest-tag:
     description: "Create release latest tag after calculating it"
-    default: "true"
+    default: true
   prerelease-tag:
     description: "Prerelease tag to add at the end of the version tag"
     default: ""
   build-metadata:
     description: "Build metadata to add at the end of the version tag"
     default: ""
+  prerelease-separator:
+    description: "Separator for the prerelease tag (A.B.C<sep>tag), defaults to '-'"
+    default: "-"
+  build-separator:
+    description: "Separator for the build-metadata tag (A.B.C<sep>tag), defaults to '+'"
+    default: "+"
+  version-separator:
+    description: "Separator for the version tag (A<sep>B<sep>C), defaults to '.'"
+    default: "."
   github-token:
     description: "Github Token to create the tag at the end of the process (required if want to create tag at the end)"
-  action-path:
-    description: "Path to clone action scripts"
-    required: false
-    default: ./.github/actions/.auto-versioning
-  
+    default: ${{ github.token }}
 outputs:
   version_str:
     description: "version string"
@@ -121,57 +142,6 @@ outputs:
   cumulative-change-percentage:
     description: The sum of all change percentages between commits
     value: ${{ steps.main-process.outputs.cumulative_percentage }}
-
 runs:
-  using: "composite"
-  steps:
-    - name: 📩 Checkout Source
-      uses: actions/checkout@v4
-      with:
-        repository: HenryCabarcas/auto-versioning
-        path: ${{ inputs.action-path }}
-
-    - name: 🐍 Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13'
-
-    - name: ⏬ Install the gh cli
-      uses: dev-hanz-ops/install-gh-cli-action@v0.2.1
-      with:
-        gh-cli-version: 2.67.0
-
-    - name: 🐞 Debug context
-      shell: bash
-      if: inputs.debug == 'true'
-      run: echo '${{ toJson(github) }}'
-  
-    - name: 🤖 Automatic version tag
-      id: main-process
-      run: ${{ inputs.action-path }}/start.sh
-      shell: bash
-      env:
-        ACTION_WORKDIR: ${{ inputs.action-path }}
-        SRC_PATH: ${{ github.workspace }}
-        GH_TOKEN: ${{ inputs.github-token || github.token }}
-        target_commit: "${{ inputs.target-commit }}"
-        source_commit: "${{ inputs.source-commit }}"
-        patch_limit: "${{ inputs.patch-limit }}"
-        minor_limit: "${{ inputs.minor-limit }}"
-        directory: "${{ inputs.directory }}"
-        exclude: "${{ inputs.exclude }}"
-        include_only: "${{ inputs.include-only }}"
-        important_files: "${{ inputs.important-files }}"
-        importance_rate: "${{ inputs.importance-rate }}"
-        v_prefix: "${{ inputs.v-prefix }}"
-        is_alpha: "${{ inputs.is-alpha }}"
-        is_beta: "${{ inputs.is-beta }}"
-        is_rc: "${{ inputs.is-rc }}"
-        is_draft: "${{ inputs.is-draft }}"
-        is_prerelease: "${{ inputs.is-prerelease }}"
-        create_tag: "${{ inputs.create-tag }}"
-        create_major_tag: "${{ inputs.create-major-tag }}"
-        create_latest_tag: "${{ inputs.create-latest-tag }}"
-        prerelease_tag: "${{ inputs.prerelease-tag }}"
-        build_metadata: "${{ inputs.build-metadata }}"
-        debug: "${{ inputs.debug }}"
+  using: "node20"
+  main: "dist/index.js"
