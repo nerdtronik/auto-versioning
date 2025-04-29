@@ -20,7 +20,7 @@ log.showDate = false;
 export async function run() {
   const inputs = await readInputs();
   if (inputs.debug) log.level = "debug";
-  log.debug(inputs);
+  if (inputs.debug) console.table(inputs);
 
   let excludedFiles: string[] = [".git/**"];
   let includedFiles: string[] = [];
@@ -86,11 +86,11 @@ export async function run() {
   const insertionsChange = Math.abs(diff.insertions / totalLines) * 100;
   const deletionsChange = Math.abs(diff.deletions / totalLines) * 100;
 
-  log.info("Deletions change detected:", Math.round(deletionsChange), "%");
-  log.info("insertions change detected:", Math.round(insertionsChange), "%");
+  log.info("Deletions change detected:", deletionsChange, "%");
+  log.info("insertions change detected:", insertionsChange, "%");
 
   const maxChange = Math.max(insertionsChange, deletionsChange);
-  log.info("Max detected change:", Math.round(maxChange), "%");
+  log.info("Max detected change:", maxChange, "%");
 
   core.setOutput("max-change-percentage", maxChange);
   core.setOutput(

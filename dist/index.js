@@ -42783,7 +42783,7 @@ function updateTag(maxChange, currentTag, inputs) {
         prerelease.split(inputs.versionSep).length === 1)
         if (maxChange <= inputs.patchLimit) {
             log.info("Changes lower than", inputs.patchLimit, "%, increasing PATCH version");
-            if (prerelease.split(".")[1]?.length > 0)
+            if (increase === false)
                 currentTag.patch += 1;
         }
         else if (maxChange <= inputs.minorLimit) {
@@ -42901,6 +42901,7 @@ async function createorUpdateTag(gh, tag, sha, isDraft, isPrerelease, latest) {
     catch (e) {
         log.info("Failed to update tag", tag, "trying to create it");
     }
+    log.info(tag, isDraft, isPrerelease);
     const res = await gh.request(`POST /repos/{owner}/{repo}/releases`, {
         ...githubExports.context.repo,
         tag_name: tag,
@@ -42929,7 +42930,8 @@ async function run() {
     const inputs = await readInputs();
     if (inputs.debug)
         log.level = "debug";
-    log.debug(inputs);
+    if (inputs.debug)
+        console.table(inputs);
     let excludedFiles = [".git/**"];
     let includedFiles = [];
     if (inputs.excludeGitignore === true)
@@ -42967,10 +42969,10 @@ async function run() {
     log.info("Total files in project:", files.length);
     const insertionsChange = Math.abs(diff.insertions / totalLines) * 100;
     const deletionsChange = Math.abs(diff.deletions / totalLines) * 100;
-    log.info("Deletions change detected:", Math.round(deletionsChange), "%");
-    log.info("insertions change detected:", Math.round(insertionsChange), "%");
+    log.info("Deletions change detected:", deletionsChange, "%");
+    log.info("insertions change detected:", insertionsChange, "%");
     const maxChange = Math.max(insertionsChange, deletionsChange);
-    log.info("Max detected change:", Math.round(maxChange), "%");
+    log.info("Max detected change:", maxChange, "%");
     coreExports.setOutput("max-change-percentage", maxChange);
     coreExports.setOutput("min-change-percentage", Math.min(insertionsChange, deletionsChange));
     coreExports.setOutput("avg-change-percentage", (insertionsChange + deletionsChange) / 2);

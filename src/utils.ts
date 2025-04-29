@@ -291,6 +291,7 @@ export async function getLatestTag(
       tag.tag_name !== "latest" &&
       semverRegex.test(tag.tag_name)
   );
+
   const latest = tags.reduce((a: any, b: any) => {
     return new Date(a.published_at) > new Date(b.published_at) ? a : b;
   });
@@ -373,7 +374,7 @@ export function updateTag(
         inputs.patchLimit,
         "%, increasing PATCH version"
       );
-      if (prerelease.split(".")[1]?.length > 0) currentTag.patch += 1;
+      if (increase===false) currentTag.patch += 1;
     } else if (maxChange <= inputs.minorLimit) {
       log.info(
         "Changes lower than",
@@ -545,7 +546,7 @@ async function createorUpdateTag(
   } catch (e) {
     log.info("Failed to update tag", tag, "trying to create it");
   }
-
+  log.info(tag, isDraft,isPrerelease);
   const res = await gh.request(`POST /repos/{owner}/{repo}/releases`, {
     ...github.context.repo,
     tag_name: tag,
