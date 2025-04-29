@@ -42783,7 +42783,7 @@ function updateTag(maxChange, currentTag, inputs) {
         prerelease.split(inputs.versionSep).length === 1)
         if (maxChange <= inputs.patchLimit) {
             log.info("Changes lower than", inputs.patchLimit, "%, increasing PATCH version");
-            if (prerelease.split(".")[1]?.length > 0)
+            if (increase === false)
                 currentTag.patch += 1;
         }
         else if (maxChange <= inputs.minorLimit) {

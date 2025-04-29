@@ -1,5 +1,7 @@
 # Automatic Versioning Tag Calculator
 
+[![🐦 Deploy](https://github.com/nerdtronik/auto-versioning/actions/workflows/push.yml/badge.svg)](https://github.com/nerdtronik/auto-versioning/actions/workflows/push.yml)
+
 This actions calculates your repo versioning tags based on [Semantic Versioning 2.0.0 | Semantic Versioning](https://semver.org/spec/v2.0.0.html) syntaxis, it calculates to change major, minor and patch version based on a percentage of changes between commits.
 For example, if your current version is `v1.2.1` if you merge a pr with changes of 75%, your next version will be a major version, resulting in `v2.0.0`, but if the changes are 30%, your next version will be `v1.3.0`, and so on. These thresholds can be modified with the instructions below.
 

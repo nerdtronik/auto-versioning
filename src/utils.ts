@@ -373,7 +373,7 @@ export function updateTag(
         inputs.patchLimit,
         "%, increasing PATCH version"
       );
-      if (prerelease.split(".")[1]?.length > 0) currentTag.patch += 1;
+      if (increase===false) currentTag.patch += 1;
     } else if (maxChange <= inputs.minorLimit) {
       log.info(
         "Changes lower than",
