@@ -2,7 +2,8 @@ on:
   pull_request:
     branches: ["main"]
 jobs:
-  pr-workflow:
+  pull-request:
+    name: 🎫 pull-request
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -12,9 +13,6 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 2 # Fetch enough history to compare commits
-      - run: |
-          echo ' BASE ${{ github.event.pull_request.base.sha }}'
-          echo ' HEAD ${{ github.event.pull_request.head.sha }}'
       - name: Calculate Next Version
         uses: ./
         id: versioning

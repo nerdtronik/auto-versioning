@@ -3,6 +3,7 @@ on:
     branches: ["main"]
 jobs:
   push-workflow:
+    name: 🐦 Deploy
     runs-on: ubuntu-latest
     permissions:
       contents: write
