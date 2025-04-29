@@ -325,7 +325,7 @@ jobs:
 
 | Field                            | Type               | Description                                       |
 | -------------------------------- | ------------------ | ------------------------------------------------- |
-| **version_str**                  | `string`           | Calculated version string                         |
+| **version**                      | `string`           | Calculated version string                         |
 | **major**                        | `number`           | Version major value                               |
 | **minor**                        | `number`           | Version minor value                               |
 | **patch**                        | `number`           | Version patch value                               |

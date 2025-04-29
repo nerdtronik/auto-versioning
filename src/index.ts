@@ -108,7 +108,7 @@ export async function run() {
 
   const newTag = updateTag(maxChange, latestTag, inputs);
 
-  core.setOutput("version_str", newTag.tagString);
+  core.setOutput("version", newTag.tagString);
   core.setOutput("major", newTag.major);
   core.setOutput("minor", newTag.minor);
   core.setOutput("patch", newTag.patch);
