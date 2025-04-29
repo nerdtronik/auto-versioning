@@ -42779,8 +42779,9 @@ function updateTag(maxChange, currentTag, inputs) {
         }
         prerelease = `${is_oneof}${currentPreVersion.length > 0 ? inputs.versionSep : ""}${currentPreVersion}`;
     }
-    if (prerelease.length === 0 ||
-        prerelease.split(inputs.versionSep).length === 1)
+    if ((prerelease.length === 0 ||
+        prerelease.split(inputs.versionSep).length === 1) &&
+        maxChange > 0)
         if (maxChange <= inputs.patchLimit) {
             log.info("Changes lower than", inputs.patchLimit, "%, increasing PATCH version");
             if (increase === false)

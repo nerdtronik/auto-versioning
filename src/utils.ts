@@ -365,8 +365,9 @@ export function updateTag(
   }
 
   if (
-    prerelease.length === 0 ||
-    prerelease.split(inputs.versionSep).length === 1
+    (prerelease.length === 0 ||
+      prerelease.split(inputs.versionSep).length === 1) &&
+    maxChange > 0
   )
     if (maxChange <= inputs.patchLimit) {
       log.info(
@@ -374,7 +375,7 @@ export function updateTag(
         inputs.patchLimit,
         "%, increasing PATCH version"
       );
-      if (increase===false) currentTag.patch += 1;
+      if (increase === false) currentTag.patch += 1;
     } else if (maxChange <= inputs.minorLimit) {
       log.info(
         "Changes lower than",
@@ -546,7 +547,7 @@ async function createorUpdateTag(
   } catch (e) {
     log.info("Failed to update tag", tag, "trying to create it");
   }
-  log.info(tag, isDraft,isPrerelease);
+  log.info(tag, isDraft, isPrerelease);
   const res = await gh.request(`POST /repos/{owner}/{repo}/releases`, {
     ...github.context.repo,
     tag_name: tag,
