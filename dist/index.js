@@ -42978,7 +42978,7 @@ async function run() {
     coreExports.setOutput("avg-change-percentage", (insertionsChange + deletionsChange) / 2);
     coreExports.setOutput("cumulative-change-percentage", insertionsChange + deletionsChange);
     const newTag = updateTag(maxChange, latestTag, inputs);
-    coreExports.setOutput("version_str", newTag.tagString);
+    coreExports.setOutput("version", newTag.tagString);
     coreExports.setOutput("major", newTag.major);
     coreExports.setOutput("minor", newTag.minor);
     coreExports.setOutput("patch", newTag.patch);

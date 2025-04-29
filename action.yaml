@@ -97,7 +97,7 @@ inputs:
     description: "Github Token to create the tag at the end of the process (required if want to create tag at the end)"
     default: ${{ github.token }}
 outputs:
-  version_str:
+  version:
     description: "version string"
   major:
     description: "Version major number"
