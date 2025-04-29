@@ -99,49 +99,34 @@ inputs:
 outputs:
   version_str:
     description: "version string"
-    value: ${{ steps.main-process.outputs.version_str }}
   major:
     description: "Version major number"
-    value: ${{ steps.main-process.outputs.major }}
   minor:
     description: "Version minor number"
-    value: ${{ steps.main-process.outputs.minor }}
   patch:
     description: "Version patch number"
-    value: ${{ steps.main-process.outputs.patch }}
   prerelease:
     description: "Version prerelease info"
-    value: ${{ steps.main-process.outputs.prerelease }}
   build-metadata:
     description: "Version build-metadata info"
-    value: ${{ steps.main-process.outputs.build_metadata }}
   files-changed:
     description: How many files were changed between commits
-    value: ${{ steps.main-process.outputs.files_changed }}
   files-added:
     description: How many files were added between commits
-    value: ${{ steps.main-process.outputs.files_added }}
   files-removed:
     description: How many files were removed between commits
-    value: ${{ steps.main-process.outputs.files_removed }}
   insertions:
     description: How many lines were added between commits
-    value: ${{ steps.main-process.outputs.insertions }}
   deletions:
     description: How many lines were removed between commits
-    value: ${{ steps.main-process.outputs.deletions }}
   max-change-percentage:
     description: The maximum change percentage between commits
-    value: ${{ steps.main-process.outputs.max_percentage }}
   min-change-percentage:
     description: The minimum change percentage between commits
-    value: ${{ steps.main-process.outputs.min_percentage }}
   avg-change-percentage:
     description: The average change percentage between commits
-    value: ${{ steps.main-process.outputs.avg_percentage }}
   cumulative-change-percentage:
     description: The sum of all change percentages between commits
-    value: ${{ steps.main-process.outputs.cumulative_percentage }}
 runs:
   using: "node20"
   main: "dist/index.js"
