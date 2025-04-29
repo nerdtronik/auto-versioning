@@ -20,7 +20,7 @@ log.showDate = false;
 export async function run() {
   const inputs = await readInputs();
   if (inputs.debug) log.level = "debug";
-  log.debug(inputs);
+  if (inputs.debug) console.table(inputs);
 
   let excludedFiles: string[] = [".git/**"];
   let includedFiles: string[] = [];

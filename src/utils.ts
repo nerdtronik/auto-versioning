@@ -291,6 +291,8 @@ export async function getLatestTag(
       tag.tag_name !== "latest" &&
       semverRegex.test(tag.tag_name)
   );
+
+  log.debug(tags);
   const latest = tags.reduce((a: any, b: any) => {
     return new Date(a.published_at) > new Date(b.published_at) ? a : b;
   });

@@ -42715,6 +42715,7 @@ async function getLatestTag(gh, repo, versionSep = ".", prereleaseSep = "-", bui
         tag.prerelease === false &&
         tag.tag_name !== "latest" &&
         semverRegex.test(tag.tag_name));
+    log.debug(tags);
     const latest = tags.reduce((a, b) => {
         return new Date(a.published_at) > new Date(b.published_at) ? a : b;
     });
@@ -42929,7 +42930,8 @@ async function run() {
     const inputs = await readInputs();
     if (inputs.debug)
         log.level = "debug";
-    log.debug(inputs);
+    if (inputs.debug)
+        console.table(inputs);
     let excludedFiles = [".git/**"];
     let includedFiles = [];
     if (inputs.excludeGitignore === true)
