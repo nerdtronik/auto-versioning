@@ -36493,6 +36493,100 @@ function requireLib () {
 var libExports = /*@__PURE__*/ requireLib();
 var fs = /*@__PURE__*/getDefaultExportFromCjs(libExports);
 
+const LEVELS = {
+    trace: -1,
+    debug: 0,
+    info: 1,
+    done: 1,
+    warn: 2,
+    fail: 3,
+    error: 3,
+    critical: 4,
+    panic: 4,
+};
+const LEVEL_COLORS = {
+    trace: ["bgMagentaBright", "white", "bold"],
+    debug: ["cyan", "bold"],
+    info: ["white", "bold"],
+    done: ["green", "bold"],
+    warn: ["yellowBright", "bold"],
+    fail: ["red", "bold"],
+    error: ["redBright", "bold"],
+    critical: ["bgRedBright", "white", "bold"],
+    panic: ["bgWhite", "redBright", "bold"],
+};
+class Logger {
+    level = "info";
+    env = "default";
+    separator = " ";
+    showDate = true;
+    showLevel = true;
+    showEnv = true;
+    constructor(level = "info", env = "default") {
+        this.level = level;
+        this.env = env;
+    }
+    joinMessages(messages) {
+        if (!Array.isArray(messages))
+            return messages;
+        return Array.from(messages.map((msg) => {
+            if (Array.isArray(msg))
+                return JSON.stringify(msg.map((item) => this.joinMessages(item)));
+            if (typeof msg === "object")
+                return JSON.stringify(msg, null, 2);
+            return String(msg);
+        })).join(this.separator);
+    }
+    __logger(messages, level) {
+        if (LEVELS[level] < LEVELS[this.level])
+            return;
+        const message = this.joinMessages(messages);
+        let pre = [];
+        if (this.showDate) {
+            pre.push(styleText(["green"], `[${new Date().toISOString()}]`));
+        }
+        if (this.showEnv) {
+            pre.push("(" + styleText(["magentaBright", "italic"], this.env) + ")");
+        }
+        if (this.showLevel) {
+            pre.push(styleText(LEVEL_COLORS[level], level.toUpperCase()));
+        }
+        console.log(pre.join(" ") + ": " + message);
+        if (LEVELS[level] === 2)
+            console.log(`::warn::${message}`);
+        else if (LEVELS[level] > 2)
+            console.log(`::error::${message}`);
+    }
+    trace(...messages) {
+        this.__logger(messages, "trace");
+    }
+    debug(...messages) {
+        this.__logger(messages, "debug");
+    }
+    info(...messages) {
+        this.__logger(messages, "info");
+    }
+    done(...messages) {
+        this.__logger(messages, "done");
+    }
+    warn(...messages) {
+        this.__logger(messages, "warn");
+    }
+    fail(...messages) {
+        this.__logger(messages, "fail");
+    }
+    error(...messages) {
+        this.__logger(messages, "error");
+    }
+    critical(...messages) {
+        this.__logger(messages, "critical");
+    }
+    panic(...messages) {
+        this.__logger(messages, "panic");
+    }
+}
+let log = new Logger();
+
 var dist$1 = {};
 
 var src$1 = {};
@@ -42476,12 +42570,10 @@ async function getDiff(source = "", target = "", dir = ".", exclude = [], includ
         include.length === 0 ? dir : "",
         ...include,
         ...exclude,
-        ":^.gitignore"
+        ":^.gitignore",
     ]);
     const diff = await git.diff(options);
-    console.log(diff);
     const changes = changesRegex.exec(diff)?.groups ?? {};
-    console.log(changes);
     const deleted_files = diff.match(/\s+delete\s+mode/g)?.length ?? 0;
     const created_files = diff.match(/\s+create\s+mode/g)?.length ?? 0;
     const res = {
@@ -42518,11 +42610,15 @@ async function getFileList(ph, include, exclude) {
             return;
         if (fs.lstatSync(item).isFile()) {
             if (include.length > 0) {
-                if (include.includes(item))
-                    res.push({ path: item, lines: await countLines(item) });
+                if (include.includes(item)) {
+                    const fileRes = { path: item, lines: await countLines(item) };
+                    res.push(fileRes);
+                }
             }
-            else
-                res.push({ path: item, lines: await countLines(item) });
+            else {
+                const fileRes = { path: item, lines: await countLines(item) };
+                res.push(fileRes);
+            }
         }
         else {
             const nestRes = await getFileList(require$$1$5.join(ph, require$$1$5.basename(item)), include, exclude);
@@ -42551,9 +42647,10 @@ async function readInputs() {
     const include = coreExports.getInput("include")
         .split(",")
         .filter((item) => item.trim().length > 0);
-    const importantFiles = coreExports.getInput("important-files")
-        .split(",")
-        .filter((item) => item.trim().length > 0);
+    // const importantFiles = core
+    //   .getInput("important-files")
+    //   .split(",")
+    //   .filter((item) => item.trim().length > 0);
     let sourceCommit = coreExports.getInput("source-commit");
     let targetCommit = coreExports.getInput("target-commit");
     let patchLimit = Number(coreExports.getInput("patch-limit"));
@@ -42562,9 +42659,8 @@ async function readInputs() {
     let minorLimit = Number(coreExports.getInput("minor-limit"));
     if (minorLimit === 0)
         minorLimit = 75;
-    let importanceRate = Number(coreExports.getInput("importance-rate"));
-    if (importanceRate === 0)
-        importanceRate = 1.1;
+    // let importanceRate = Number(core.getInput("importance-rate"));
+    // if (importanceRate === 0) importanceRate = 1.1;
     const vPrefix = coreExports.getInput("v-prefix") === "true" ? true : false;
     const isAlpha = coreExports.getBooleanInput("is-alpha");
     const isBeta = coreExports.getBooleanInput("is-beta");
@@ -42573,15 +42669,17 @@ async function readInputs() {
     const isPrerelease = coreExports.getBooleanInput("is-prerelease");
     const keyAlpha = coreExports.getInput("alpha-key");
     const keyBeta = coreExports.getInput("beta-key");
-    const keyrRc = coreExports.getInput("rc-key");
+    const keyRc = coreExports.getInput("rc-key");
     const debug = coreExports.getBooleanInput("debug");
     const createTag = coreExports.getBooleanInput("create-tag");
     const createMajorTag = coreExports.getBooleanInput("create-major-tag");
+    const createMinorTag = coreExports.getBooleanInput("create-minor-tag");
     const createLatestTag = coreExports.getBooleanInput("create-latest-tag");
     const prereleaseTag = coreExports.getInput("prerelease-tag");
     const buildMetadata = coreExports.getInput("build-metadata");
     const prereleaseSep = coreExports.getInput("prerelease-separator");
     const buildSep = coreExports.getInput("build-separator");
+    const versionSep = coreExports.getInput("version-separator");
     const excludeGitignore = coreExports.getBooleanInput("exclude-gitignore");
     let githubToken = coreExports.getInput("github-token");
     if (githubToken.length === 0 && process.env.TEST)
@@ -42596,8 +42694,8 @@ async function readInputs() {
         targetCommit,
         patchLimit,
         minorLimit,
-        importantFiles,
-        importanceRate,
+        // importantFiles,
+        // importanceRate,
         vPrefix,
         isAlpha,
         isBeta,
@@ -42606,10 +42704,11 @@ async function readInputs() {
         isPrerelease,
         keyAlpha,
         keyBeta,
-        keyrRc,
+        keyRc,
         debug,
         createTag,
         createMajorTag,
+        createMinorTag,
         createLatestTag,
         prereleaseTag,
         buildMetadata,
@@ -42617,16 +42716,17 @@ async function readInputs() {
         buildSep,
         githubToken,
         excludeGitignore,
+        versionSep,
     };
 }
-async function getLatestTag(gh, repo, prereleaseSep = "-", buildSep = "+") {
-    const semverRegex = new RegExp(`^v*(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:(-|\\${prereleaseSep})(?<prerelease>(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:(\\+|\\${buildSep})(?<buildMetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$`);
+async function getLatestTag(gh, repo, versionSep = ".", prereleaseSep = "-", buildSep = "+") {
+    const semverRegex = new RegExp(`^v*(?<major>\\d+)(?:\\.|\\${versionSep})(?<minor>\\d+)(?:\\.|\\${versionSep})(?<patch>\\d+)(?:(?:-|\\${prereleaseSep})(?<prerelease>(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:(?:\\.|\\${versionSep})(?:\\d+|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:(?:\\+|\\${buildSep})(?<buildMetadata>[0-9a-zA-Z-]+(?:(?:\\.|\\${versionSep})[0-9a-zA-Z-]+)*))?$`);
     const tags = (await gh.rest.repos.listReleases(repo)).data.filter((tag) => tag.draft === false &&
         tag.prerelease === false &&
         tag.tag_name !== "latest" &&
         semverRegex.test(tag.tag_name));
     const latest = tags.reduce((a, b) => {
-        return new Date(a.created_at) > new Date(b.created_at) ? a : b;
+        return new Date(a.published_at) > new Date(b.published_at) ? a : b;
     });
     const tagDescription = semverRegex.exec(latest.tag_name)?.groups;
     if (!tagDescription)
@@ -42646,98 +42746,184 @@ async function getLatestTag(gh, repo, prereleaseSep = "-", buildSep = "+") {
     };
     return tagVersion;
 }
-
-const LEVELS = {
-    trace: -1,
-    debug: 0,
-    info: 1,
-    done: 1,
-    warn: 2,
-    fail: 3,
-    error: 3,
-    critical: 4,
-    panic: 4,
-};
-const LEVEL_COLORS = {
-    trace: ["bgMagentaBright", "white", "bold"],
-    debug: ["cyan", "bold"],
-    info: ["white", "bold"],
-    done: ["green", "bold"],
-    warn: ["yellowBright", "bold"],
-    fail: ["red", "bold"],
-    error: ["redBright", "bold"],
-    critical: ["bgRedBright", "white", "bold"],
-    panic: ["bgWhite", "redBright", "bold"],
-};
-class Logger {
-    level = "info";
-    env = "default";
-    separator = " ";
-    showDate = true;
-    showLevel = true;
-    showEnv = true;
-    constructor(level = "info", env = "default") {
-        this.level = level;
-        this.env = env;
+function updateTag(maxChange, currentTag, inputs) {
+    log.info("Calculating new tag version");
+    let prerelease = "";
+    let is_oneof = "";
+    let increase = false;
+    if (currentTag.prerelease?.includes(inputs.keyAlpha))
+        is_oneof = inputs.keyAlpha;
+    else if (currentTag.prerelease?.includes(inputs.keyBeta))
+        is_oneof = inputs.keyBeta;
+    else if (currentTag.prerelease?.includes(inputs.keyRc))
+        is_oneof = inputs.keyRc;
+    if (inputs.isAlpha === true) {
+        increase = inputs.keyAlpha === is_oneof;
+        is_oneof = inputs.keyAlpha;
     }
-    joinMessages(messages) {
-        return Array.from(messages.map((msg) => {
-            if (Array.isArray(msg))
-                return JSON.stringify(msg.map((item) => this.joinMessages(item)));
-            if (typeof msg === "object")
-                return JSON.stringify(msg, null, 2);
-            return String(msg);
-        })).join(this.separator);
+    else if (inputs.isBeta === true) {
+        increase = inputs.keyBeta === is_oneof;
+        is_oneof = inputs.keyBeta;
     }
-    __logger(messages, level) {
-        if (LEVELS[level] < LEVELS[this.level])
-            return;
-        const message = this.joinMessages(messages);
-        let pre = [];
-        if (this.showDate) {
-            pre.push(styleText(["green"], `[${new Date().toISOString()}]`));
+    else if (inputs.isRc === true) {
+        increase = inputs.keyRc === is_oneof;
+        is_oneof = inputs.keyRc;
+    }
+    else
+        is_oneof = "";
+    if (is_oneof.length > 0) {
+        let currentPreVersion = "";
+        if (increase) {
+            currentPreVersion = String(Number(currentTag.prerelease
+                ?.replace(inputs.keyAlpha, "")
+                .replace(inputs.keyBeta, "")
+                .replace(inputs.keyRc, "")
+                .split(inputs.versionSep)[1] ?? 0) + 1);
         }
-        if (this.showEnv) {
-            pre.push("(" + styleText(["magentaBright", "italic"], this.env) + ")");
+        prerelease = `${is_oneof}${currentPreVersion.length > 0 ? inputs.versionSep : ""}${currentPreVersion}`;
+    }
+    if (prerelease.length === 0 ||
+        prerelease.split(inputs.versionSep).length === 1)
+        if (maxChange <= inputs.patchLimit) {
+            log.info("Changes lower than", inputs.patchLimit, "%, increasing PATCH version");
+            if (prerelease.split(".")[1]?.length > 0)
+                currentTag.patch += 1;
         }
-        if (this.showLevel) {
-            pre.push(styleText(LEVEL_COLORS[level], level.toUpperCase()));
+        else if (maxChange <= inputs.minorLimit) {
+            log.info("Changes lower than", inputs.minorLimit, "%, increasing MINOR version");
+            currentTag.minor += 1;
+            currentTag.patch = 0;
+            if (prerelease.length > 0)
+                prerelease = is_oneof;
         }
-        console.log(pre.join(" ") + ": " + message);
-        if (LEVELS[level] === 2)
-            console.log(`::warn::${message}`);
-        else if (LEVELS[level] > 2)
-            console.log(`::error::${message}`);
+        else {
+            log.info("Changes higher than", inputs.minorLimit, "%, increasing MAJOR version");
+            currentTag.major += 1;
+            currentTag.minor = 0;
+            currentTag.patch = 0;
+            if (prerelease.length > 0)
+                prerelease = is_oneof;
+        }
+    let tagString = "";
+    if (inputs.vPrefix === true)
+        tagString = "v";
+    tagString += `${currentTag.major}${inputs.versionSep}${currentTag.minor}${inputs.versionSep}${currentTag.patch}`;
+    currentTag.prerelease = prerelease;
+    if (prerelease.length > 0)
+        tagString += inputs.prereleaseSep + prerelease;
+    currentTag.buildMetadata = inputs.buildMetadata;
+    if (inputs.buildMetadata.length > 0) {
+        tagString += inputs.buildSep + inputs.buildMetadata;
     }
-    trace(...messages) {
-        this.__logger(messages, "trace");
-    }
-    debug(...messages) {
-        this.__logger(messages, "debug");
-    }
-    info(...messages) {
-        this.__logger(messages, "info");
-    }
-    done(...messages) {
-        this.__logger(messages, "done");
-    }
-    warn(...messages) {
-        this.__logger(messages, "warn");
-    }
-    fail(...messages) {
-        this.__logger(messages, "fail");
-    }
-    error(...messages) {
-        this.__logger(messages, "error");
-    }
-    critical(...messages) {
-        this.__logger(messages, "critical");
-    }
-    panic(...messages) {
-        this.__logger(messages, "panic");
-    }
+    currentTag.tagString = tagString;
+    return currentTag;
 }
-let log = new Logger();
+async function createTag(gh, tag, inputs) {
+    let creation = [];
+    const defaultTag = async () => {
+        log.info("Creating tag version", tag.tagString);
+        const success = await createorUpdateTag(gh, tag.tagString, inputs.sourceCommit, inputs.isDraft, inputs.isPrerelease, inputs.createLatestTag === false);
+        if (success === false)
+            coreExports.setFailed("Failed to create tag: " + tag.tagString);
+        return success;
+    };
+    creation.push(defaultTag);
+    if (inputs.createMajorTag) {
+        creation.push(async () => {
+            let tagString = "";
+            if (inputs.vPrefix)
+                tagString += "v";
+            tagString += String(tag.major);
+            if (tag.prerelease && tag.prerelease.length > 0)
+                tagString += inputs.prereleaseSep + tag.prerelease;
+            if (tag.buildMetadata && tag.buildMetadata.length > 0)
+                tagString += inputs.buildSep + tag.buildMetadata;
+            log.info("Creating tag:", tagString);
+            const success = await createorUpdateTag(gh, tagString, inputs.sourceCommit, inputs.isDraft, inputs.isPrerelease, inputs.createLatestTag === false);
+            if (success === false)
+                coreExports.setFailed("Failed to create tag: " + tagString);
+            return success;
+        });
+    }
+    if (inputs.createMinorTag) {
+        creation.push(async () => {
+            let tagString = "";
+            if (inputs.vPrefix)
+                tagString += "v";
+            tagString += `${tag.major}${inputs.versionSep}${tag.minor}`;
+            if (tag.prerelease && tag.prerelease.length > 0)
+                tagString += inputs.prereleaseSep + tag.prerelease;
+            if (tag.buildMetadata && tag.buildMetadata.length > 0)
+                tagString += inputs.buildSep + tag.buildMetadata;
+            log.info("Creating tag:", tagString);
+            const success = await createorUpdateTag(gh, tagString, inputs.sourceCommit, inputs.isDraft, inputs.isPrerelease, inputs.createLatestTag === false);
+            if (success === false)
+                coreExports.setFailed("Failed to create tag: " + tagString);
+            return success;
+        });
+    }
+    if (inputs.createLatestTag) {
+        creation.push(async () => {
+            log.info("Creating tag: latest");
+            const success = await createorUpdateTag(gh, "latest", inputs.sourceCommit, inputs.isDraft, inputs.isPrerelease, true);
+            if (success === false)
+                coreExports.setFailed("Failed to create tag: latest");
+            return success;
+        });
+    }
+    const res = await Promise.all(creation.map((item) => item()));
+    if (res.every((result) => result === false))
+        coreExports.setFailed("failed to create tags");
+}
+async function createorUpdateTag(gh, tag, sha, isDraft, isPrerelease, latest) {
+    try {
+        const existingTag = await gh.request("GET /repos/{owner}/{repo}/releases/tags/{tag}", {
+            ...githubExports.context.repo,
+            tag: tag,
+            headers: {
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        });
+        const releaseId = existingTag.data.id;
+        const res = await gh.request("DELETE /repos/{owner}/{repo}/releases/{release_id}", {
+            ...githubExports.context.repo,
+            release_id: releaseId,
+            headers: {
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        });
+        await gh.request("DELETE /repos/{owner}/{repo}/git/refs/tags/{tag}", {
+            ...githubExports.context.repo,
+            tag: tag,
+        });
+        if (res.status >= 400) {
+            log.info("Failed to update tag", tag);
+            return false;
+        }
+    }
+    catch (e) {
+        log.info("Failed to update tag", tag, "trying to create it");
+    }
+    const res = await gh.request(`POST /repos/{owner}/{repo}/releases`, {
+        ...githubExports.context.repo,
+        tag_name: tag,
+        name: tag,
+        body: "Generated automatically using auto-versioning",
+        draft: isDraft,
+        target_commitish: sha,
+        prerelease: isPrerelease,
+        generate_release_notes: true,
+        make_latest: latest == true ? "true" : "false",
+        headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    });
+    if (res.status >= 200 && res.status <= 299) {
+        log.info("Tag", tag, "Successfully created");
+        return true;
+    }
+    return false;
+}
 
 log.level = "info";
 log.env = githubExports.context.repo.repo;
@@ -42765,14 +42951,20 @@ async function run() {
         includedFiles = includedFiles.concat(inputs.include);
     log.info("Analizying directory:", inputs.dir);
     const gh = githubExports.getOctokit(inputs.githubToken);
-    const latestTag = await getLatestTag(gh, githubExports.context.repo, inputs.prereleaseSep, inputs.buildSep);
-    const exclude = await getFilesglob(excludedFiles);
-    const include = await getFilesglob(includedFiles);
-    let diff = await getDiff(inputs.sourceCommit, inputs.targetCommit, inputs.dir, exclude, include);
-    log.info("diff");
-    console.table(diff);
+    const latestTag = await getLatestTag(gh, githubExports.context.repo, inputs.versionSep, inputs.prereleaseSep, inputs.buildSep);
     log.info("latest tag:", latestTag.tagString);
     console.table(latestTag);
+    let diff = await getDiff(inputs.sourceCommit, inputs.targetCommit, inputs.dir, excludedFiles, includedFiles);
+    log.info("diff");
+    log.info(inputs.sourceCommit, "->", inputs.targetCommit);
+    console.table(diff);
+    coreExports.setOutput("files-changed", diff.filesChanged);
+    coreExports.setOutput("files-added", diff.filesCreated);
+    coreExports.setOutput("files-removed", diff.filesDeleted);
+    coreExports.setOutput("insertions", diff.insertions);
+    coreExports.setOutput("deletions", diff.deletions);
+    const exclude = await getFilesglob(excludedFiles);
+    const include = await getFilesglob(includedFiles);
     const files = await getFileList(inputs.dir, include, exclude);
     let totalLines = 0;
     for (var i = 0; i < files.length; i++) {
@@ -42780,9 +42972,32 @@ async function run() {
         totalLines += file.lines;
     }
     log.info("Total lines in project (now):", totalLines);
-    totalLines = totalLines - Math.abs(diff.insertions) + Math.abs(diff.deletions);
+    totalLines =
+        totalLines - Math.abs(diff.insertions) + Math.abs(diff.deletions);
     log.info("Total lines in project (before):", totalLines);
     log.info("Total files in project:", files.length);
+    const insertionsChange = Math.abs(diff.insertions / totalLines) * 100;
+    const deletionsChange = Math.abs(diff.deletions / totalLines) * 100;
+    log.info("Deletions change detected:", Math.round(deletionsChange), "%");
+    log.info("insertions change detected:", Math.round(insertionsChange), "%");
+    const maxChange = Math.max(insertionsChange, deletionsChange);
+    log.info("Max detected change:", Math.round(maxChange), "%");
+    coreExports.setOutput("max-change-percentage", maxChange);
+    coreExports.setOutput("min-change-percentage", Math.min(insertionsChange, deletionsChange));
+    coreExports.setOutput("avg-change-percentage", (insertionsChange + deletionsChange) / 2);
+    coreExports.setOutput("cumulative-change-percentage", insertionsChange + deletionsChange);
+    const newTag = updateTag(maxChange, latestTag, inputs);
+    coreExports.setOutput("version_str", newTag.tagString);
+    coreExports.setOutput("major", newTag.major);
+    coreExports.setOutput("minor", newTag.minor);
+    coreExports.setOutput("patch", newTag.patch);
+    coreExports.setOutput("prerelease", newTag.prerelease ?? "");
+    coreExports.setOutput("build-metadata", newTag.buildMetadata ?? "");
+    log.info("New version");
+    console.table(newTag);
+    if (inputs.createTag === true) {
+        await createTag(gh, newTag, inputs);
+    }
 }
 run();
 

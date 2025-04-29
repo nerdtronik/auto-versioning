@@ -100,6 +100,7 @@ export class Logger {
   }
 
   joinMessages(messages: any[]): string {
+    if (!Array.isArray(messages)) return messages;
     return Array.from(
       messages.map((msg) => {
         if (Array.isArray(msg))

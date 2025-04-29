@@ -30,12 +30,12 @@ inputs:
   exclude-gitignore:
     description: "Parse gitignore files to exlude comparing files based on the content of those gitinores (default true)"
     default: true
-  important-files:
-    description: "List of files, paths, patterns (./*path*) to mark as important for changes checking (comma separated)"
-    default: ""
-  importance-rate:
-    description: "How important an important file will be (default 1.1)"
-    default: 1.1
+  # important-files:
+  #   description: "List of files, paths, patterns (./*path*) to mark as important for changes checking (comma separated)"
+  #   default: ""
+  # importance-rate:
+  #   description: "How important an important file will be (default 1.1)"
+  # default: 1.1
   v-prefix:
     description: "Include the 'v' prefix in the version tag: vA.B.C"
     default: true
@@ -70,7 +70,10 @@ inputs:
     description: "Create release tag after calculating it"
     default: true
   create-major-tag:
-    description: "Create release major tag after calculating it"
+    description: "Create release major tag after calculating it. (Ex. v3)"
+    default: true
+  create-minor-tag:
+    description: "Create release minor tag after calculating it. (Ex. v3.1)"
     default: true
   create-latest-tag:
     description: "Create release latest tag after calculating it"
@@ -87,6 +90,9 @@ inputs:
   build-separator:
     description: "Separator for the build-metadata tag (A.B.C<sep>tag), defaults to '+'"
     default: "+"
+  version-separator:
+    description: "Separator for the version tag (A<sep>B<sep>C), defaults to '.'"
+    default: "."
   github-token:
     description: "Github Token to create the tag at the end of the process (required if want to create tag at the end)"
     default: ${{ github.token }}
