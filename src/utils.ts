@@ -3,10 +3,6 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { GitHub } from "@actions/github/lib/utils";
 import { create as createGlob } from "@actions/glob";
-import {
-  PullRequestEvent,
-  PushEvent,
-} from "@octokit/webhooks-definitions/schema";
 import { execSync } from "child_process";
 import fs from "fs-extra";
 import path from "path";
@@ -182,16 +178,6 @@ type Inputs = {
 };
 
 export async function readInputs(): Promise<Inputs> {
-  let payload: PushEvent | PullRequestEvent;
-  if (github.context.eventName === "push") {
-    payload = github.context.payload as PushEvent;
-    payload;
-    core.info(`The head commit is: ${payload.head_commit}`);
-    console.log(payload);
-  } else if (github.context.eventName === "pull_request") {
-    payload = github.context.payload as PullRequestEvent;
-    console.log(payload);
-  }
   let dir = core.getInput("directory");
   if (dir.length === 0) dir = path.resolve(".");
   const exclude = core

@@ -42628,16 +42628,6 @@ async function getFileList(ph, include, exclude) {
     return res;
 }
 async function readInputs() {
-    let payload;
-    if (githubExports.context.eventName === "push") {
-        payload = githubExports.context.payload;
-        coreExports.info(`The head commit is: ${payload.head_commit}`);
-        console.log(payload);
-    }
-    else if (githubExports.context.eventName === "pull_request") {
-        payload = githubExports.context.payload;
-        console.log(payload);
-    }
     let dir = coreExports.getInput("directory");
     if (dir.length === 0)
         dir = require$$1$5.resolve(".");
@@ -42929,14 +42919,6 @@ log.level = "info";
 log.env = githubExports.context.repo.repo;
 log.showDate = false;
 async function run() {
-    let payload;
-    if (githubExports.context.eventName === "push") {
-        payload = githubExports.context.payload;
-        coreExports.info(`The head commit is: ${payload.head_commit}`);
-    }
-    else if (githubExports.context.eventName === "pull_request") {
-        payload = githubExports.context.payload;
-    }
     const inputs = await readInputs();
     if (inputs.debug)
         log.level = "debug";

@@ -19,10 +19,9 @@ jobs:
         uses: ./
         id: versioning
         with:
-          is-draft: "true" # Publich as draft version
+          is-draft: true # Publich as draft version
           build-metadata: ${{ github.workflow_sha }}
-          create-tag: "false" # Don't create tag, only returns at output
-          debug: "true" # Show debug messages
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          create-tag: false # Don't create tag, only returns at output
+          debug: true # Show debug messages
       - name: Show Output
         run: echo '${{ toJson(steps.versioning.outputs) }}'
