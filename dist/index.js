@@ -42620,7 +42620,7 @@ async function getFileList(ph, include, exclude) {
                 res.push(fileRes);
             }
         }
-        else {
+        else if (fs.lstatSync(item).isDirectory()) {
             const nestRes = await getFileList(require$$1$5.join(ph, require$$1$5.basename(item)), include, exclude);
             res = res.concat(nestRes);
         }

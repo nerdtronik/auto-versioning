@@ -131,7 +131,7 @@ export async function getFileList(
           const fileRes = { path: item, lines: await countLines(item) };
           res.push(fileRes);
         }
-      } else {
+      } else if (fs.lstatSync(item).isDirectory()) {
         const nestRes = await getFileList(
           path.join(ph, path.basename(item)),
           include,
