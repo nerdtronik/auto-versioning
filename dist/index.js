@@ -42600,7 +42600,7 @@ function countLines(file) {
     });
 }
 async function getFileList(ph, include, exclude) {
-    if (!fs.pathExistsSync(ph) || fs.lstatSync(ph).isFile())
+    if (!fs.pathExistsSync(ph) || !fs.lstatSync(ph).isDirectory())
         return [];
     const fileList = fs.readdirSync(ph);
     let res = [];

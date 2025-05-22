@@ -114,7 +114,7 @@ export async function getFileList(
   include: string[],
   exclude: string[]
 ): Promise<FileResponse[]> {
-  if (!fs.pathExistsSync(ph) || fs.lstatSync(ph).isFile()) return [];
+  if (!fs.pathExistsSync(ph) || !fs.lstatSync(ph).isDirectory()) return [];
   const fileList = fs.readdirSync(ph);
   let res: FileResponse[] = [];
   await Promise.all(
