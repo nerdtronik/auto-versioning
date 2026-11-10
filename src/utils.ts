@@ -51,9 +51,9 @@ export async function getDiff(
   exclude: string[] = [],
   include: string[] = []
 ) {
-  exclude = exclude.map((exc) => `':^${exc}'`.replaceAll("_", "*"));
+  exclude = exclude.map((exc) => `':^${exc}'`.replaceAll("$$", "*"));
   include = include.map((inc) =>
-    `'${dir}${path.sep}${inc}'`.replaceAll("_", "*")
+    `'${dir}${path.sep}${inc}'`.replaceAll("$$", "*")
   );
   if (source.length === 0) source = "";
   if (target.length === 0) target = "";
